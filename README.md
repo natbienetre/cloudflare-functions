@@ -6,3 +6,7 @@
 
 1. [`@natbienetre/cloudflare-env-var-password`](./plugins/cloudflare-env-var-password/): Protects routes with a password stored in a cloudflare environment variable.
 1. [`@natbienetre/cloudflare-auto-session`](./plugins/auto-session/): Automatic session management for cloudflare workers.
+
+## Exemples
+
+1. [`@natbienetre/cloudflare-env-var-password`](./examples/cloudflare-env-var-password/): Protects routes with a password stored in a cloudflare environment variable.

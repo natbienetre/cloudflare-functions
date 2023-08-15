@@ -9,7 +9,7 @@ publish:
 	$(MAKE) run-publish
 
 ci-test:
-	YARN_RUN="install --frozen-lockfile" $(MAKE) _run
+	YARN_RUN="install --immutable" $(MAKE) _run
 	YARN_RUN="lint --format junit --output-file eslint.junit.xml"  $(MAKE) _run
 
 run-%:

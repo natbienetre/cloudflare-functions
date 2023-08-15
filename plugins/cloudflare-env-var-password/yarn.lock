@@ -63,10 +63,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@natbienetre/cloudflare-auto-session@^0.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@natbienetre/cloudflare-auto-session/-/cloudflare-auto-session-0.1.1.tgz#6baf3a39b5e254c9c2a9887bc8034301706c589a"
-  integrity sha512-fauoyGhcrQvgxJRk/Qn8w/QisNfOOs5Qra5oPghtISd5REJDg+/LBOWJi8FXkteBnuLtA8C9Ps+OXLcPPF64zA==
+"@natbienetre/cloudflare-auto-session@^0.2":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@natbienetre/cloudflare-auto-session/-/cloudflare-auto-session-0.2.0.tgz#05c4dcd0e3e6aeed447befc96451cd601d2824fc"
+  integrity sha512-t52PDopjlMVBqFezxsK2aIUycbORD+/+rRzGfJ9NATHwNX4eSZVEvKWVUmFgm6HcOsHrFRtbMvkZRSlWimHhmw==
   dependencies:
     cookie "^0.5.0"
     crypto-js "^4.1.1"

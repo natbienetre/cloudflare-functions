@@ -1,7 +1,6 @@
 {
   "name": "pages",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "preinstall": "test ! -L $(npm root)/@natbienetre || rm -f $(npm root)/@natbienetre",

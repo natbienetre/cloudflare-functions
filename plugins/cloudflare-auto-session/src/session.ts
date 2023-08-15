@@ -1,22 +1,25 @@
 import { parse } from 'cookie'
 import HmacSHA256 from 'crypto-js/hmac-sha256'
 
-import { Cookie, type CookieSpec } from './cookie'
+import { Cookie } from './cookie'
+import type { CookieSpec } from './types'
 
 export class Session {
   name: string
   secret: string
+  isValid: (data: any) => boolean
 
-  constructor (name: string, secret: string) {
-    if (name === undefined || name === '') {
+  constructor (name: string, secret: string, isValid: (data: any) => boolean) {
+    if (name === '') {
       throw new Error('Cookie name must be provided')
     }
-    if (secret === undefined || secret === '') {
+    if (secret === '') {
       throw new Error('Cookie secret must be provided')
     }
 
     this.name = name
     this.secret = secret
+    this.isValid = isValid
   }
 
   valid (request: Request): boolean {
@@ -48,7 +51,7 @@ export class Session {
       return false
     }
 
-    return true
+    return this.isValid(JSON.parse(data))
   }
 
   start (request: Request, cookieSpec?: CookieSpec): Response {

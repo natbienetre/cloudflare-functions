@@ -5,6 +5,7 @@ export interface PluginArgsWithDefaults {
   cookieSecret: string
   formAsset: string
   login: (formdata: FormData) => SessionSpec
+  isValid: (data: any) => boolean
 }
 
 const Defaults = {
@@ -16,7 +17,8 @@ const Defaults = {
       allowed: false
     }
   },
-  formAsset: 'nbe-login'
+  formAsset: 'nbe-login',
+  isValid: (_: any): boolean => true
 }
 
 export function withDefaults (args: PluginArgs): PluginArgsWithDefaults {

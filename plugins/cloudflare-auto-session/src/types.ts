@@ -20,4 +20,5 @@ export interface PluginArgs {
   cookieSecret: string
   formAsset: string
   login?: (formdata: FormData) => SessionSpec
+  isValid?: (session: SessionSpec) => boolean
 }

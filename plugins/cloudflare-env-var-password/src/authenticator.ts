@@ -24,6 +24,7 @@ export class Auth {
 
     this.getExpectedPassword = this.getExpectedPassword.bind(this)
     this.sessionData = this.sessionData.bind(this)
+    this.isValid = this.isValid.bind(this)
   }
 
   getExpectedPassword (): string {
@@ -34,6 +35,10 @@ export class Auth {
     }
 
     return expected
+  }
+
+  isValid (data: any): boolean {
+    return data.path === this.url.pathname
   }
 
   async sessionData (formData: FormData): Promise<SessionSpec> {
@@ -73,8 +78,10 @@ export class Auth {
         allowed: true,
         cookie: {
           data: {
-            username: formData.get('username')
-          }
+            username: formData.get('username'),
+            path: this.url.pathname
+          },
+          path: this.url.pathname
         }
       }
     })

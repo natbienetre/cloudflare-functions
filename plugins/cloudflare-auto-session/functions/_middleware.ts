@@ -5,7 +5,7 @@ import { withDefaults } from '../src/args'
 const authenticatedQuery = 'authenticated'
 const allowedQuery = 'allowed'
 
-export const onRequestGet = async (context: EventPluginContext<any, any, any, PluginArgs>): Promise<Response> => {
+export const onRequestGet = async (context: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Promise<Response> => {
   const { request, env, pluginArgs, next } = context
 
   // Get the arguments given to the Plugin by the developer
@@ -20,13 +20,13 @@ export const onRequestGet = async (context: EventPluginContext<any, any, any, Pl
 
     console.debug('Proxy to login form', url.toString())
 
-    return env.ASSETS.fetch(new Request(url, request))
+    return await env.ASSETS.fetch(new Request(url, request))
   }
 
   return await next()
 }
 
-export const onRequestPost = async ({ request, pluginArgs }: EventPluginContext<any, any, any, PluginArgs>): Promise<Response> => {
+export const onRequestPost = async ({ request, pluginArgs }: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Promise<Response> => {
   // Get the arguments given to the Plugin by the developer
   const { cookieName, cookieSecret, login } = withDefaults(pluginArgs)
 

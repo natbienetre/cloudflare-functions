@@ -1,0 +1,3 @@
+[vars]
+SECRET = "my-secret"
+"PASS_/admin" = "the-password"

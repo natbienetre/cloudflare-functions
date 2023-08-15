@@ -2,7 +2,7 @@ import type { PluginArgs, PasswordEncodingMethod } from './types'
 
 export interface PluginArgsWithDefaults {
   cookieName: string
-  getEnvVarName: (context: EventContext<any, any, any>) => string
+  getEnvVarName: (_: EventContext<any, any, any>) => string
   passwordEncodingMethod: PasswordEncodingMethod
   passwordFieldName: string
 }

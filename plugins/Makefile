@@ -16,7 +16,6 @@ run-%:
 	YARN_RUN=$* $(MAKE) _run
 
 YARN_RUN ?= --version
-CACHE_FOLDER ?= $(CURDIR)/.yarn/cache
 
 _run:
-	$(foreach plugin,$(PLUGINS),cd $(plugin) && yarn --cache-folder=$(CACHE_FOLDER) $(YARN_RUN) && cd ..;)
+	$(foreach plugin,$(PLUGINS),cd '$(CURDIR)/$(plugin)' && yarn $(YARN_RUN) ;)

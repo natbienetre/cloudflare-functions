@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "preinstall": "test ! -L $(npm root)/@natbienetre || rm -f $(npm root)/@natbienetre",
-    "lint": "eslint --ext .ts .",
-    "predev": "(test -L $(npm root)/@natbienetre || (rm -rf $(npm root)/@natbienetre && ln -s ../../plugins $(npm root)/@natbienetre)) && make -C $(npm root)/@natbienetre run-dev",
-    "dev": "wrangler pages dev ."
+    "build": "yarn run wrangler pages functions build --plugin --outdir=dist",
+    "prepare": "yarn build",
+    "lint": "eslint --ext .ts ."
   },
   "dependencies": {
     "@natbienetre/cloudflare-env-var-password": "^0.0.1"
@@ -20,5 +19,6 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "typescript": "*"
-  }
+  },
+  "packageManager": "yarn@3.6.1"
 }

@@ -1,3 +1,3 @@
 import type { PluginArgs } from './src/types'
 
-export default function (args: PluginArgs): PagesFunction
+export default function (_: PluginArgs): PagesFunction

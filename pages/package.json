@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "test ! -L $(npm root)/@natbienetre || rm -f $(npm root)/@natbienetre",
     "lint": "eslint --ext .ts .",
-    "predev": "test -L $(npm root)/@natbienetre || rm -rf $(npm root)/@natbienetre && ln -s ../../plugins $(npm root)/@natbienetre",
+    "predev": "(test -L $(npm root)/@natbienetre || (rm -rf $(npm root)/@natbienetre && ln -s ../../plugins $(npm root)/@natbienetre)) && make -C $(npm root)/@natbienetre run-dev",
     "dev": "wrangler pages dev ."
   },
   "dependencies": {

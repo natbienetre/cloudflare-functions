@@ -13,7 +13,8 @@
   "scripts": {
     "build": "npx wrangler pages functions build --plugin --outdir=dist",
     "prepare": "npm run build",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "dev": "npm run build"
   },
   "dependencies": {
     "cookie": "^0.5.0",

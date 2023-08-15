@@ -13,7 +13,9 @@
   "scripts": {
     "build": "npx wrangler pages functions build --plugin --outdir=dist",
     "prepare": "npm run build",
-    "lint": "eslint --ext .ts ."
+    "lint": "eslint --ext .ts .",
+    "predev": "cd ../cloudflare-auto-session && yarn build && (test -L $(npm root)/@natbienetre || (rm -rf $(npm root)/@natbienetre && ln -s ../.. $(npm root)/@natbienetre))",
+    "dev": "npm run build"
   },
   "dependencies": {
     "@natbienetre/cloudflare-auto-session": "^0.2"

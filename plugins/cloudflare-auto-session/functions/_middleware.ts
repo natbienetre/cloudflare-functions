@@ -9,9 +9,9 @@ export const onRequestGet = async (context: EventPluginContext<Record<string, st
   const { request, env, pluginArgs, next } = context
 
   // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, formAsset } = withDefaults(pluginArgs)
+  const { cookieName, cookieSecret, formAsset, isValid } = withDefaults(pluginArgs)
 
-  const session = new Session(cookieName, cookieSecret)
+  const session = new Session(cookieName, cookieSecret, isValid)
 
   if (!session.valid(request)) {
     const url = new URL(request.url)
@@ -28,9 +28,9 @@ export const onRequestGet = async (context: EventPluginContext<Record<string, st
 
 export const onRequestPost = async ({ request, pluginArgs }: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Promise<Response> => {
   // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, login } = withDefaults(pluginArgs)
+  const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs)
 
-  const session = new Session(cookieName, cookieSecret)
+  const session = new Session(cookieName, cookieSecret, isValid)
 
   if (session.valid(request)) {
     await request.body?.cancel()

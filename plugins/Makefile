@@ -6,7 +6,7 @@ lint: run-lint
 
 publish:
 	@git diff-index --quiet HEAD -- || (echo "Working directory is not clean" && exit 1)
-	$(MAKE) run-publish
+	YARN_RUN="npm publish" $(MAKE) _run
 
 ci-test:
 	YARN_RUN="install --immutable" $(MAKE) _run
@@ -19,4 +19,4 @@ YARN_RUN ?= --version
 CACHE_FOLDER ?= $(CURDIR)/.yarn/cache
 
 _run:
-	$(foreach plugin,$(PLUGINS),cd $(plugin) && yarn --cache-folder=$(CACHE_FOLDER) $(YARN_RUN) && cd ..;)
+	$(foreach plugin,$(PLUGINS),cd $(plugin) && yarn $(YARN_RUN) && cd ..;)

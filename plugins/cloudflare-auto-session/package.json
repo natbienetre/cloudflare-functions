@@ -2,7 +2,7 @@
   "name": "@natbienetre/cloudflare-auto-session",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "files": [

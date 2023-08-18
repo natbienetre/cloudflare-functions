@@ -6,7 +6,7 @@ lint: run-lint
 
 publish:
 	@git diff-index --quiet HEAD -- || (echo "Working directory is not clean" && exit 1)
-	YARN_RUN="npm publish" $(MAKE) _run
+	YARN_RUN="npm publish --access public" $(MAKE) _run
 
 ci-test:
 	YARN_RUN="install --immutable" $(MAKE) _run

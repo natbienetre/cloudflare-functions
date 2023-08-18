@@ -12,10 +12,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cloudflare/workers-types@npm:^4.20230807.0":
-  version: 4.20230807.0
-  resolution: "@cloudflare/workers-types@npm:4.20230807.0"
-  checksum: 944a1c6a37462c100b5e615c89131ff54bf1095fcd811f43a9d2cc5fa285c9722eef5fba1805fab080d550fff1dcff24197365b92c7d2116df76b7d894a4a372
+"@cloudflare/workers-types@npm:^4.20230814.0":
+  version: 4.20230814.0
+  resolution: "@cloudflare/workers-types@npm:4.20230814.0"
+  checksum: 782b0def59d58ef83088a662aa9260b3c3ef911daa9ca443612047c524f29709810ac3b5fdd16eb5de7767beeb69b3331e12dedd085c0039159d1e4cf862f36b
   languageName: node
   linkType: hard
 
@@ -86,13 +86,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@natbienetre/cloudflare-auto-session@npm:^0.3":
-  version: 0.3.0
-  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.0"
+"@natbienetre/cloudflare-auto-session@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.1"
   dependencies:
     cookie: ^0.5.0
     crypto-js: ^4.1.1
-  checksum: ad622fd163c1285cff31e2d5212702525fb3fa966eb4f3af7224cbee01828c993edf70e90eaabfd273dad017aa7a99b4dec0916fe99982e08d445ff8a5831e3c
+  checksum: bd361c70974ef0e618ec6a2ea315a04b0bca0ca1996b9611ed626f17315de89650f10443848f88eca6e5eba9bf463054392215e63ce4104c2bbc79e9990da6c6
   languageName: node
   linkType: hard
 
@@ -100,14 +100,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@natbienetre/cloudflare-env-var-password@workspace:."
   dependencies:
-    "@cloudflare/workers-types": ^4.20230807.0
-    "@natbienetre/cloudflare-auto-session": ^0.3
-    "@typescript-eslint/eslint-plugin": ^5.52.0
-    eslint: ^8.0.1
+    "@cloudflare/workers-types": ^4.20230814.0
+    "@natbienetre/cloudflare-auto-session": ^0.3.1
+    "@typescript-eslint/eslint-plugin": ^5.62.0
+    eslint: ^8.47.0
     eslint-config-standard-with-typescript: ^37.0.0
-    eslint-plugin-import: ^2.25.2
+    eslint-plugin-import: ^2.28.0
     eslint-plugin-n: "^15.0.0 || ^16.0.0 "
-    eslint-plugin-promise: ^6.0.0
+    eslint-plugin-promise: ^6.1.1
     typescript: "*"
   languageName: unknown
   linkType: soft
@@ -160,7 +160,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^5.52.0":
+"@typescript-eslint/eslint-plugin@npm:^5.62.0":
   version: 5.62.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.62.0"
   dependencies:
@@ -746,7 +746,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import@npm:^2.25.2":
+"eslint-plugin-import@npm:^2.28.0":
   version: 2.28.0
   resolution: "eslint-plugin-import@npm:2.28.0"
   dependencies:
@@ -792,7 +792,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-promise@npm:^6.0.0":
+"eslint-plugin-promise@npm:^6.1.1":
   version: 6.1.1
   resolution: "eslint-plugin-promise@npm:6.1.1"
   peerDependencies:
@@ -828,7 +828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.0.1":
+"eslint@npm:^8.47.0":
   version: 8.47.0
   resolution: "eslint@npm:8.47.0"
   dependencies:

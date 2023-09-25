@@ -69,8 +69,6 @@ export class Auth {
     return await hash.then((hash: string): SessionSpec => {
       const passwordMatch = hash === expected
 
-      console.debug(`Password: ${hash} === ${expected}`, passwordMatch)
-
       if (!passwordMatch) {
         return {
           authenticated: true,

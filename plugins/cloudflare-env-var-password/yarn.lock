@@ -86,13 +86,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@natbienetre/cloudflare-auto-session@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.1"
+"@natbienetre/cloudflare-auto-session@npm:0.3.2":
+  version: 0.3.2
+  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.2"
   dependencies:
     cookie: ^0.5.0
     crypto-js: ^4.1.1
-  checksum: bd361c70974ef0e618ec6a2ea315a04b0bca0ca1996b9611ed626f17315de89650f10443848f88eca6e5eba9bf463054392215e63ce4104c2bbc79e9990da6c6
+  checksum: 4220a07c866a98d035f2f6f72eaf8d41da428689b3e1feaa80cc4f326f39d0209c1fd958832d8eeaf0038bf791a5977d984a49d022b704fbf70a6ee9b513573f
   languageName: node
   linkType: hard
 
@@ -101,7 +101,7 @@ __metadata:
   resolution: "@natbienetre/cloudflare-env-var-password@workspace:."
   dependencies:
     "@cloudflare/workers-types": ^4.20230814.0
-    "@natbienetre/cloudflare-auto-session": ^0.3.1
+    "@natbienetre/cloudflare-auto-session": 0.3.2
     "@typescript-eslint/eslint-plugin": ^5.62.0
     eslint: ^8.47.0
     eslint-config-standard-with-typescript: ^37.0.0

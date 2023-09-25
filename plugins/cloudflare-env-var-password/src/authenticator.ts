@@ -43,11 +43,13 @@ export class Auth {
 
   async sessionData (formData: FormData): Promise<SessionSpec> {
     const expected = this.getExpectedPassword()
-
     const password = formData.get(this.passwordFieldName)
 
     if (password === null || password === undefined) {
-      throw new Error(`Password field '${this.passwordFieldName}' not found`)
+      return {
+        authenticated: false,
+        allowed: false
+      }
     }
 
     formData.delete(this.passwordFieldName)
@@ -63,13 +65,16 @@ export class Auth {
           return btoa(String.fromCharCode(...new Uint8Array(hash)))
         })
     }
-    return await hash.then((hash: string) => {
-      console.debug(`Password: ${hash} === ${password}`, hash === password)
 
-      if (hash !== expected) {
+    return await hash.then((hash: string): SessionSpec => {
+      const passwordMatch = hash === expected
+
+      console.debug(`Password: ${hash} === ${expected}`, passwordMatch)
+
+      if (!passwordMatch) {
         return {
-          authenticated: false,
-          allowed: false
+          authenticated: true,
+          allowed: passwordMatch
         }
       }
 
@@ -78,8 +83,8 @@ export class Auth {
         allowed: true,
         cookie: {
           data: {
-            username: formData.get('username'),
-            path: this.url.pathname
+            path: this.url.pathname,
+            ...formData.entries()
           },
           path: this.url.pathname
         }

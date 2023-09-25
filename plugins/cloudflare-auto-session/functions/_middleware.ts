@@ -5,7 +5,7 @@ import { withDefaults } from '../src/args'
 const authenticatedQuery = 'authenticated'
 const allowedQuery = 'allowed'
 
-export const onRequestGet = async (context: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Promise<Response> => {
+export const onRequestGet = (context: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Response | Promise<Response> => {
   const { request, env, pluginArgs, next } = context
 
   // Get the arguments given to the Plugin by the developer
@@ -20,21 +20,19 @@ export const onRequestGet = async (context: EventPluginContext<Record<string, st
 
     console.debug('Proxy to login form', url.toString())
 
-    return await env.ASSETS.fetch(new Request(url, request))
+    return env.ASSETS.fetch(new Request(url, request))
   }
 
-  return await next()
+  return next()
 }
 
-export const onRequestPost = async ({ request, pluginArgs }: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Promise<Response> => {
+export const onRequestPost = ({ request, pluginArgs }: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Response | Promise<Response> => {
   // Get the arguments given to the Plugin by the developer
   const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs)
 
   const session = new Session(cookieName, cookieSecret, isValid)
 
   if (session.valid(request)) {
-    await request.body?.cancel()
-
     return new Response('Already logged in', {
       status: 302,
       headers: {
@@ -45,7 +43,7 @@ export const onRequestPost = async ({ request, pluginArgs }: EventPluginContext<
 
   const url = new URL(request.url)
 
-  return await request.formData()
+  return request.formData()
     .then(login)
     .then(({ authenticated, allowed, cookie }: SessionSpec): Response => {
       url.searchParams.set(authenticatedQuery, authenticated.toString())

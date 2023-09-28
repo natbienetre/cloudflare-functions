@@ -2,7 +2,7 @@
   "name": "@natbienetre/cloudflare-env-var-password",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "files": [
@@ -18,16 +18,16 @@
     "dev": "npm run build"
   },
   "dependencies": {
-    "@natbienetre/cloudflare-auto-session": "^0.3"
+    "@natbienetre/cloudflare-auto-session": "0.3.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230807.0",
-    "@typescript-eslint/eslint-plugin": "^5.52.0",
-    "eslint": "^8.0.1",
+    "@cloudflare/workers-types": "^4.20230814.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "eslint": "^8.47.0",
     "eslint-config-standard-with-typescript": "^37.0.0",
-    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-import": "^2.28.0",
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
-    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-promise": "^6.1.1",
     "typescript": "*"
   }
 }

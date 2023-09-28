@@ -17,7 +17,7 @@ const Defaults = {
       allowed: false
     }
   },
-  formAsset: 'nbe-login',
+  formAsset: '/nbe-login/',
   isValid: (_: any): boolean => true
 }
 

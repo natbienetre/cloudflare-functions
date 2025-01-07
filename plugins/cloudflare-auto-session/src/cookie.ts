@@ -1,28 +1,36 @@
-import type { CookieSpec } from './types'
+import type { CookieSpec } from './types';
+
+export interface CookieData {
+  [key: string]: CookieData;
+}
 
 export class Cookie {
-  spec?: CookieSpec
+  spec?: CookieSpec;
 
-  constructor (spec?: CookieSpec) {
-    this.spec = spec
+  constructor(spec?: CookieSpec) {
+    this.spec = spec;
   }
 
-  headerSetCookie (name: string, encode: (data?: any) => string): string {
-    if (this.spec === undefined) return ''
+  headerSetCookie(name: string, encode: (data?: CookieData) => string): string {
+    if (this.spec === undefined) return '';
 
-    const value = encode(this.spec.data)
+    const value = encode(this.spec.data);
 
     const cookieParts = [
       name + '=' + value,
       this.spec.domain !== undefined ? 'Domain=' + this.spec.domain : '',
       this.spec.path !== undefined ? 'Path=' + this.spec.path : '',
-      this.spec.expires !== undefined ? 'Expires=' + this.spec.expires.toUTCString() : '',
-      this.spec.maxAge !== undefined ? 'Max-Age=' + this.spec.maxAge.toString() : '',
+      this.spec.expires !== undefined
+        ? 'Expires=' + this.spec.expires.toUTCString()
+        : '',
+      this.spec.maxAge !== undefined
+        ? 'Max-Age=' + this.spec.maxAge.toString()
+        : '',
       this.spec.secure !== undefined ? 'Secure' : '',
       this.spec.httpOnly !== undefined ? 'HttpOnly' : '',
-      this.spec.sameSite !== undefined ? 'SameSite=' + this.spec.sameSite : ''
-    ]
+      this.spec.sameSite !== undefined ? 'SameSite=' + this.spec.sameSite : '',
+    ];
 
-    return cookieParts.filter((part) => part !== '').join('; ')
+    return cookieParts.filter(part => part !== '').join('; ');
   }
 }

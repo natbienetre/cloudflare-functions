@@ -1,15 +1,19 @@
-import type { GoogleBot } from './google'
+import type { GoogleBot } from './google';
 
-export type PasswordEncodingMethod = string | SubtleCryptoHashAlgorithm
+export type PasswordEncodingMethod = string | SubtleCryptoHashAlgorithm;
+
+export type Env = {
+  [key: string]: string;
+};
 
 export interface AllowedBots {
-  google: Map<GoogleBot, boolean>
+  google: Map<GoogleBot, boolean>;
 }
 
 export interface PluginArgs {
-  cookieName?: string
-  getEnvVarName?: (context: EventContext<any, any, any>) => string
-  passwordEncodingMethod?: PasswordEncodingMethod
-  passwordFieldName?: string
-  allowedBots: AllowedBots
+  cookieName?: string;
+  getEnvVarName?: (context: EventContext<Env, string, unknown>) => string;
+  passwordEncodingMethod?: PasswordEncodingMethod;
+  passwordFieldName?: string;
+  allowedBots: AllowedBots;
 }

@@ -1,78 +1,82 @@
-import { containsCidr } from 'cidr-tools'
-import pThrottle from '../p-throttle'
+import { containsCidr } from 'cidr-tools';
+import pThrottle from '../p-throttle';
 
 interface IPsData {
-  creationTime: Date
-  cidrs: string[]
+  creationTime: Date;
+  cidrs: string[];
 }
 
 export default class IPsVerifier {
-  readonly url: string
+  readonly url: string;
 
-  private ipsData: IPsData
+  private ipsData: IPsData;
 
-  constructor (url: string) {
-    this.url = url
+  constructor(url: string) {
+    this.url = url;
 
     const throttler = pThrottle({
       limit: 1,
-      interval: 1000 * 60 * 60 // 1 hour
-    })
+      interval: 1000 * 60 * 60, // 1 hour
+    });
 
-    this.getData = throttler(this.getData).bind(this)
-    this.update = this.update.bind(this)
-    this.check = this.check.bind(this)
+    this.getData = throttler(this.getData).bind(this);
+    this.update = this.update.bind(this);
+    this.check = this.check.bind(this);
 
     // Initialize data
     this.update().catch(error => {
-      throw error
-    })
+      throw error;
+    });
   }
 
-  async update (): Promise<void> {
+  async update(): Promise<void> {
     await this.getData().then(data => {
-      console.info(`Refreshed trusted IPs with ${data.cidrs.length} cidrs, released at ${data.creationTime.toISOString()}...`)
+      console.info(
+        `Refreshed trusted IPs with ${data.cidrs.length} cidrs, released at ${data.creationTime.toISOString()}...`
+      );
 
-      this.ipsData = data
-    })
+      this.ipsData = data;
+    });
   }
 
-  async getData (): Promise<IPsData> {
-    console.debug(`Fetching trusted IPs from ${this.url}...`)
+  async getData(): Promise<IPsData> {
+    console.debug(`Fetching trusted IPs from ${this.url}...`);
 
     return await fetch(this.url, {
       method: 'GET',
       headers: new Headers({
-        'If-Modified-Since': this.ipsData.creationTime.toString()
-      })
+        'If-Modified-Since': this.ipsData.creationTime.toString(),
+      }),
     }).then(async (res: Response): Promise<IPsData> => {
-      const { headers } = res
-      const contentType = headers.get('content-type') ?? ''
+      const { headers } = res;
+      const contentType = headers.get('content-type') ?? '';
 
       if (contentType.includes('application/json')) {
-        throw new Error(`Unexpected content-type: ${contentType}`)
+        throw new Error(`Unexpected content-type: ${contentType}`);
       }
 
-      return await res.json().then((data: {
-        creationTime: string
-        prefixes: Array<{
-          ipv6Prefix?: string
-          ipv4Prefix?: string
-        }>
-      }): IPsData => {
-        return {
-          creationTime: new Date(data.creationTime),
-          cidrs: data.prefixes
-            .map((prefix) => prefix.ipv4Prefix ?? prefix.ipv6Prefix ?? '')
-            .filter(cidr => cidr !== '')
+      return await res.json().then(
+        (data: {
+          creationTime: string;
+          prefixes: Array<{
+            ipv6Prefix?: string;
+            ipv4Prefix?: string;
+          }>;
+        }): IPsData => {
+          return {
+            creationTime: new Date(data.creationTime),
+            cidrs: data.prefixes
+              .map(prefix => prefix.ipv4Prefix ?? prefix.ipv6Prefix ?? '')
+              .filter(cidr => cidr !== ''),
+          };
         }
-      })
-    })
+      );
+    });
   }
 
-  check (ip: string): boolean {
-    this.update().catch(console.error)
+  check(ip: string): boolean {
+    this.update().catch(console.error);
 
-    return containsCidr(this.ipsData.cidrs, ip)
+    return containsCidr(this.ipsData.cidrs, ip);
   }
 }

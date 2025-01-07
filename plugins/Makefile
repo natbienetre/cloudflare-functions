@@ -19,4 +19,4 @@ YARN_RUN ?= --version
 CACHE_FOLDER ?= $(CURDIR)/.yarn/cache
 
 _run:
-	$(foreach plugin,$(PLUGINS),cd $(plugin) && yarn $(YARN_RUN) && cd ..;)
+	$(foreach plugin,$(PLUGINS),cd $(plugin) && yarn $(YARN_RUN) ; cd ..;)

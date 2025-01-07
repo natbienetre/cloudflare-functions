@@ -43,8 +43,7 @@ export const onRequestPost = ({ request, pluginArgs }: EventPluginContext<Record
 
   const url = new URL(request.url)
 
-  return request.formData()
-    .then(login)
+  return login(request)
     .then(({ authenticated, allowed, cookie }: SessionSpec): Response => {
       url.searchParams.set(authenticatedQuery, authenticated.toString())
       url.searchParams.set(allowedQuery, allowed.toString())

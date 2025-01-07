@@ -18,7 +18,9 @@
     "dev": "npm run build"
   },
   "dependencies": {
-    "@natbienetre/cloudflare-auto-session": "0.3.2"
+    "@natbienetre/cloudflare-auto-session": "0.3.2",
+    "cidr-tools": "^11.0.2",
+    "p-throttle": "^7.0.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230814.0",

@@ -1,13 +1,15 @@
 import type { CookieSpec } from './types'
 
 export class Cookie {
-  spec: CookieSpec
+  spec?: CookieSpec
 
   constructor (spec?: CookieSpec) {
-    this.spec = spec ?? {}
+    this.spec = spec
   }
 
   headerSetCookie (name: string, encode: (data?: any) => string): string {
+    if (this.spec === undefined) return ''
+
     const value = encode(this.spec.data)
 
     const cookieParts = [

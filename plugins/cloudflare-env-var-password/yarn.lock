@@ -103,11 +103,13 @@ __metadata:
     "@cloudflare/workers-types": ^4.20230814.0
     "@natbienetre/cloudflare-auto-session": 0.3.2
     "@typescript-eslint/eslint-plugin": ^5.62.0
+    cidr-tools: ^11.0.2
     eslint: ^8.47.0
     eslint-config-standard-with-typescript: ^37.0.0
     eslint-plugin-import: ^2.28.0
     eslint-plugin-n: "^15.0.0 || ^16.0.0 "
     eslint-plugin-promise: ^6.1.1
+    p-throttle: ^7.0.0
     typescript: "*"
   languageName: unknown
   linkType: soft
@@ -481,6 +483,15 @@ __metadata:
     ansi-styles: ^4.1.0
     supports-color: ^7.1.0
   checksum: fe75c9d5c76a7a98d45495b91b2172fa3b7a09e0cc9370e5c8feb1c567b85c4288e2b3fded7cfdd7359ac28d6b3844feb8b82b8686842e93d23c827c417e83fc
+  languageName: node
+  linkType: hard
+
+"cidr-tools@npm:^11.0.2":
+  version: 11.0.2
+  resolution: "cidr-tools@npm:11.0.2"
+  dependencies:
+    ip-bigint: ^8.2.0
+  checksum: 2f02d99b7e69595c4937098a4ece8e63f70b41baad6f7033cad7be926cabe1e2f1fd8df5f4975fda4488f9e960b387b7874e85075e311e8e58c8f73b9df79702
   languageName: node
   linkType: hard
 
@@ -1264,6 +1275,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ip-bigint@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "ip-bigint@npm:8.2.0"
+  checksum: e877e4f8447800ce08e0202daffbfb7b865deae7dadbbeddf02e3f4b9584134665cd45417a31f9de5159610ebcba594d6bf8e63c3cebe26fbc86761c0c1c8647
+  languageName: node
+  linkType: hard
+
 "is-array-buffer@npm:^3.0.1, is-array-buffer@npm:^3.0.2":
   version: 3.0.2
   resolution: "is-array-buffer@npm:3.0.2"
@@ -1664,6 +1682,13 @@ __metadata:
   dependencies:
     p-limit: ^3.0.2
   checksum: 1623088f36cf1cbca58e9b61c4e62bf0c60a07af5ae1ca99a720837356b5b6c5ba3eb1b2127e47a06865fee59dd0453cad7cc844cda9d5a62ac1a5a51b7c86d3
+  languageName: node
+  linkType: hard
+
+"p-throttle@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "p-throttle@npm:7.0.0"
+  checksum: ede8b1444bcb9200ebb95415c5eb2fba301ab12de4a9cffe3b8f383ca640e6d52aed417ee0df6705217a8e5aa8faadc5169fc56be7e99d32d34b9a74727d1d4d
   languageName: node
   linkType: hard
 

@@ -4,14 +4,14 @@ export interface PluginArgsWithDefaults {
   cookieName: string
   cookieSecret: string
   formAsset: string
-  login: (formdata: FormData) => SessionSpec
+  login: (request: Request) => Promise<SessionSpec>
   isValid: (data: any) => boolean
 }
 
 const Defaults = {
   cookieName: 'cloudflare-plugin',
   cookieSecret: 'secret',
-  login: (_: FormData): SessionSpec => {
+  login: async (_: Request): Promise<SessionSpec> => {
     return {
       authenticated: false,
       allowed: false

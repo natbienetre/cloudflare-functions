@@ -1,4 +1,4 @@
-import { GoogleBot } from './google/bots'
+import { GoogleBot } from './google'
 import type { PluginArgs, AllowedBots, PasswordEncodingMethod } from './types'
 
 export interface PluginArgsWithDefaults {

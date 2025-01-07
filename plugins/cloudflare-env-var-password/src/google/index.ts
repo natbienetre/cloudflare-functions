@@ -122,7 +122,7 @@ autoTriggeredBots.set(GoogleBot.AutoTriggeredReadAloud, verifier(userAgentChecke
 // https://developers.google.com/search/docs/crawling-indexing/google-user-triggered-fetchers#google_site_verifier
 autoTriggeredBots.set(GoogleBot.AutoTriggeredSiteVerifier, verifier(userAgentChecker('Google-Site-Verification'), GoogleBotVerifiers.AutoTriggeredFetchers))
 
-export const all = new Map<GoogleBot, (req: Request) => boolean>([
+export const allBots = new Map<GoogleBot, (req: Request) => boolean>([
   ...commonBots,
   ...specialBots,
   ...userTriggeredBots,

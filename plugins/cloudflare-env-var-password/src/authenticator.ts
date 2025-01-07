@@ -1,7 +1,7 @@
 import type { SessionSpec } from '@natbienetre/cloudflare-auto-session'
 
 import type { AllowedBots, PasswordEncodingMethod } from './types'
-import { all } from './google/bots'
+import { allBots } from './google'
 
 export class Auth {
   env: Record<string, string | undefined>
@@ -28,7 +28,7 @@ export class Auth {
 
     this.verifiers = [...allowedBots.google]
       .filter((value) => value[1])
-      .map((value) => all.get(value[0]) ?? ((_: Request): boolean => false))
+      .map((value) => allBots.get(value[0]) ?? ((_: Request): boolean => false))
 
     this.getExpectedPassword = this.getExpectedPassword.bind(this)
     this.verify = this.verify.bind(this)

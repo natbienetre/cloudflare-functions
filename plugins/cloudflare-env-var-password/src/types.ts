@@ -1,4 +1,4 @@
-import type { GoogleBot } from './google/bots'
+import type { GoogleBot } from './google'
 
 export type PasswordEncodingMethod = string | SubtleCryptoHashAlgorithm
 

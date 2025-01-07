@@ -109,7 +109,6 @@ __metadata:
     eslint-plugin-import: ^2.28.0
     eslint-plugin-n: "^15.0.0 || ^16.0.0 "
     eslint-plugin-promise: ^6.1.1
-    p-throttle: ^7.0.0
     typescript: "*"
   languageName: unknown
   linkType: soft
@@ -1682,13 +1681,6 @@ __metadata:
   dependencies:
     p-limit: ^3.0.2
   checksum: 1623088f36cf1cbca58e9b61c4e62bf0c60a07af5ae1ca99a720837356b5b6c5ba3eb1b2127e47a06865fee59dd0453cad7cc844cda9d5a62ac1a5a51b7c86d3
-  languageName: node
-  linkType: hard
-
-"p-throttle@npm:^7.0.0":
-  version: 7.0.0
-  resolution: "p-throttle@npm:7.0.0"
-  checksum: ede8b1444bcb9200ebb95415c5eb2fba301ab12de4a9cffe3b8f383ca640e6d52aed417ee0df6705217a8e5aa8faadc5169fc56be7e99d32d34b9a74727d1d4d
   languageName: node
   linkType: hard
 

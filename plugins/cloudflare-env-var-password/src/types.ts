@@ -1,19 +1,34 @@
+import type {
+  SessionSpec,
+  CookieData,
+} from '@natbienetre/cloudflare-auto-session';
 import type { GoogleBot } from './google';
 
 export type PasswordEncodingMethod = string | SubtleCryptoHashAlgorithm;
-
-export type Env = {
-  [key: string]: string;
-};
 
 export interface AllowedBots {
   google: Map<GoogleBot, boolean>;
 }
 
-export interface PluginArgs {
+export class AutoSessionArgs {
   cookieName?: string;
-  getEnvVarName?: (context: EventContext<Env, string, unknown>) => string;
-  passwordEncodingMethod?: PasswordEncodingMethod;
-  passwordFieldName?: string;
+  cookieSecret?: string;
+  formAsset?: string;
+  login?: (request: Request) => Promise<SessionSpec>;
+  isValid?: (session: CookieData) => boolean;
+}
+
+export interface PluginArgs {
+  session: AutoSessionArgs;
+
+  getEnvVarName: (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ) => string;
+  passwordEncodingMethod: PasswordEncodingMethod;
+  passwordFieldName: string;
   allowedBots: AllowedBots;
 }

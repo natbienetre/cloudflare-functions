@@ -34,7 +34,10 @@ export default [
       'plugin:@typescript-eslint/eslint-recommended',
       'plugin:@typescript-eslint/recommended'
     )
-    .map(config => ({ ...config, files: ['src/**/*.ts'] })),
+    .map(config => ({
+      ...config,
+      files: ['src/**/*.ts', 'functions/**/*.ts'],
+    })),
   {
     files: ['src/**/*.ts'],
     plugins: { '@typescript-eslint': typescriptEslint },

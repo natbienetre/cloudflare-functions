@@ -7,33 +7,27 @@ import type { AllowedBots, PasswordEncodingMethod } from './types';
 import { allBots } from './google';
 
 export class Auth {
-  env: Record<string, string | undefined>;
-  passwordEncodingMethod: PasswordEncodingMethod;
-  passwordFieldName: string;
-  envVarName: string;
-  url: URL;
-
-  verifiers: Array<(req: Request) => boolean>;
+  readonly passwordEncodingMethod: PasswordEncodingMethod;
+  readonly passwordFieldName: string;
+  readonly expectedPassword: string;
+  readonly url: URL;
+  readonly verifiers: Array<(req: Request) => boolean>;
 
   constructor(
     request: Request,
-    env: Record<string, string | undefined>,
-    envVarName: string,
+    password: string,
     passwordEncodingMethod: PasswordEncodingMethod,
     passwordFieldName: string,
     allowedBots: AllowedBots
   ) {
-    this.env = env;
     this.url = new URL(request.url);
     this.passwordEncodingMethod = passwordEncodingMethod;
     this.passwordFieldName = passwordFieldName;
-    this.envVarName = envVarName;
-
+    this.expectedPassword = password;
     this.verifiers = [...allowedBots.google]
       .filter(value => value[1])
       .map(value => allBots.get(value[0]) ?? ((_: Request): boolean => false));
 
-    this.getExpectedPassword = this.getExpectedPassword.bind(this);
     this.verify = this.verify.bind(this);
     this.sessionData = this.sessionData.bind(this);
     this.isValid = this.isValid.bind(this);
@@ -41,16 +35,6 @@ export class Auth {
 
   verify(req: Request): boolean {
     return this.verifiers.some(verif => verif(req));
-  }
-
-  getExpectedPassword(): string {
-    const expected = this.env[this.envVarName];
-
-    if (expected === undefined) {
-      throw new Error(`Variable '${this.envVarName}' not found`);
-    }
-
-    return expected;
   }
 
   isValid(data: CookieData): boolean {
@@ -64,8 +48,6 @@ export class Auth {
         allowed: true,
       };
     }
-
-    const expected = this.getExpectedPassword();
 
     return await request.formData().then(async formData => {
       const password = formData.get(this.passwordFieldName);
@@ -97,7 +79,7 @@ export class Auth {
       }
 
       return await hash.then((hash: string): SessionSpec => {
-        const passwordMatch = hash === expected;
+        const passwordMatch = hash === this.expectedPassword;
 
         if (!passwordMatch) {
           return {

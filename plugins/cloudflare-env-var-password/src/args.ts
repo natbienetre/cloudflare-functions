@@ -1,25 +1,55 @@
 import { GoogleBot } from './google';
 import type {
   PluginArgs,
+  AutoSessionArgs,
   AllowedBots,
   PasswordEncodingMethod,
-  Env,
 } from './types';
 
 export interface PluginArgsWithDefaults {
-  cookieName: string;
-  getEnvVarName: (context: EventContext<Env, string, unknown>) => string;
+  session: AutoSessionArgs;
+
+  getEnvVarName: (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ) => string;
   passwordEncodingMethod: PasswordEncodingMethod;
   passwordFieldName: string;
+  missingPasswordCallback: (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ) => Promise<Response>;
   allowedBots: AllowedBots;
 }
 
 export const Defaults = {
-  cookieName: 'cloudflare-plugin',
-  getEnvVarName: (_: EventContext<Env, string, unknown>): string =>
-    'CREDENTIALS',
+  session: {
+    cookieName: 'cloudflare-plugin',
+  },
+  getEnvVarName: (
+    _: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ): string => 'CREDENTIALS',
   passwordEncodingMethod: '',
   passwordFieldName: 'password',
+  missingPasswordCallback: async (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ): Promise<Response> => {
+    throw new Error(`Missing password for ${context.request.url}`);
+  },
   allowedBots: {
     google: new Map<GoogleBot, boolean>([
       [GoogleBot.Googlebot, true],

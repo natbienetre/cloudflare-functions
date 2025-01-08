@@ -1,30 +1,41 @@
 import autoSession from '@natbienetre/cloudflare-auto-session';
 
-import type { PluginArgs, Env } from '../src/types';
+import type { PluginArgs } from '../src/types';
 import { Auth } from '../src/authenticator';
 import { withDefaults } from '../src/args';
 
-export const onRequest = (
-  context: EventPluginContext<Env, any, any, PluginArgs>
-): Response | Promise<Response> => {
+export const onRequest: PagesPluginFunction<
+  Record<string, string | undefined>,
+  string,
+  Record<string, unknown>,
+  PluginArgs
+> = async context => {
+  const { env } = context;
+
   const {
     passwordEncodingMethod,
     passwordFieldName,
     getEnvVarName,
+    missingPasswordCallback,
+    session,
     allowedBots,
   } = withDefaults(context.pluginArgs);
+  const password = env[getEnvVarName(context)];
+
+  if (password === undefined) {
+    return missingPasswordCallback(context);
+  }
+
   const auth = new Auth(
     context.request,
-    context.env,
-    getEnvVarName(context),
+    password,
     passwordEncodingMethod,
     passwordFieldName,
     allowedBots
   );
 
-  return autoSession({
-    secret: context.env.SECRET,
-    login: auth.sessionData,
-    isValid: auth.isValid,
-  })(context);
+  session.isValid = auth.isValid;
+  session.login = auth.sessionData;
+
+  return autoSession(session)(context);
 };

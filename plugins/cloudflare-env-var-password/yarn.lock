@@ -128,13 +128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha4":
-  version: 0.3.3-alpha4
-  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha4"
+"@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha5":
+  version: 0.3.3-alpha5
+  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha5"
   dependencies:
     cookie: ^0.5.0
-    crypto-js: ^4.1.1
-  checksum: 4123f751d5ea5381e08fe452574e67e645523244c0512f07f3b20eafdf9b74c72755ce5110af5452787274164a5f62d532e2289ee85d36cd4608f613bc5e7ab5
+  checksum: 7332ec38a945b541546bdfb6b610876713353b6789fb82cea2f6ae38163f97ec0842e412e8f84aa3c0bfd6acfa5497e0fa88724b05134e3f242172fdfe40dd42
   languageName: node
   linkType: hard
 
@@ -145,7 +144,7 @@ __metadata:
     "@cloudflare/workers-types": ^4.20241230.0
     "@eslint/eslintrc": ^3.2.0
     "@eslint/js": ^9.17.0
-    "@natbienetre/cloudflare-auto-session": 0.3.3-alpha4
+    "@natbienetre/cloudflare-auto-session": 0.3.3-alpha5
     "@types/node": ^22.10.5
     "@typescript-eslint/eslint-plugin": ^8.19.1
     "@typescript-eslint/parser": ^8.19.1
@@ -693,13 +692,6 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 8d306efacaf6f3f60e0224c287664093fa9185680b2d195852ba9a863f85d02dcc737094c6e512175f8ee0161f9b87c73c6826034c2422e39de7d6569cf4503b
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:^4.1.1":
-  version: 4.2.0
-  resolution: "crypto-js@npm:4.2.0"
-  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 

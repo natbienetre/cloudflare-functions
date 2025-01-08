@@ -4,7 +4,10 @@ import type {
 } from '@natbienetre/cloudflare-auto-session';
 import type { GoogleBot } from './google';
 
-export type PasswordEncodingMethod = string | SubtleCryptoHashAlgorithm;
+export type PasswordEncodingMethod =
+  | string
+  | SubtleCryptoHashAlgorithm
+  | undefined;
 
 export interface AllowedBots {
   google: Map<GoogleBot, boolean>;

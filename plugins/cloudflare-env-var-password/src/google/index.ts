@@ -47,8 +47,8 @@ export enum GoogleBot {
 const verifier = (
   userAgentChecker: (_: string) => boolean,
   verifier: IPsVerifier
-): ((req: Request) => boolean) => {
-  return (req: Request): boolean => {
+): ((req: Request) => Promise<boolean>) => {
+  return async (req: Request): Promise<boolean> => {
     const userAgent = req.headers.get('User-Agent');
 
     if (userAgent === null) {
@@ -74,7 +74,10 @@ const userAgentChecker = (expected: string): ((_: string) => boolean) => {
   return (userAgent: string) => userAgent.includes(expected);
 };
 
-export const commonBots = new Map<GoogleBot, (req: Request) => boolean>();
+export const commonBots = new Map<
+  GoogleBot,
+  (req: Request) => Promise<boolean>
+>();
 
 // https://developers.google.com/search/docs/crawling-indexing/google-common-crawlers#googlebot
 commonBots.set(
@@ -135,7 +138,10 @@ commonBots.set(
   verifier(userAgentChecker('Google-Extended'), GoogleBotVerifiers.GoogleBot)
 );
 
-export const specialBots = new Map<GoogleBot, (req: Request) => boolean>();
+export const specialBots = new Map<
+  GoogleBot,
+  (req: Request) => Promise<boolean>
+>();
 
 // https://developers.google.com/search/docs/crawling-indexing/google-special-case-crawlers#apis-google
 specialBots.set(
@@ -176,7 +182,7 @@ specialBots.set(
 
 export const userTriggeredBots = new Map<
   GoogleBot,
-  (req: Request) => boolean
+  (req: Request) => Promise<boolean>
 >();
 
 // https://developers.google.com/search/docs/crawling-indexing/google-user-triggered-fetchers#feedfetcher
@@ -214,7 +220,7 @@ userTriggeredBots.set(
 
 export const autoTriggeredBots = new Map<
   GoogleBot,
-  (req: Request) => boolean
+  (req: Request) => Promise<boolean>
 >();
 
 // https://developers.google.com/search/docs/crawling-indexing/google-user-triggered-fetchers#feedfetcher
@@ -250,7 +256,7 @@ autoTriggeredBots.set(
   )
 );
 
-export const allBots = new Map<GoogleBot, (req: Request) => boolean>([
+export const allBots = new Map<GoogleBot, (req: Request) => Promise<boolean>>([
   ...commonBots,
   ...specialBots,
   ...userTriggeredBots,

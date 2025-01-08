@@ -39,7 +39,6 @@ export const Defaults = {
       Record<string, unknown>
     >
   ): string => 'CREDENTIALS',
-  passwordEncodingMethod: '',
   passwordFieldName: 'password',
   missingPasswordCallback: async (
     context: EventContext<

@@ -135,11 +135,11 @@ __metadata:
     "@cloudflare/workers-types": ^4.20241230.0
     "@eslint/eslintrc": ^3.2.0
     "@eslint/js": ^9.17.0
+    "@types/cookie": ^1.0.0
     "@types/node": ^22.10.5
     "@typescript-eslint/eslint-plugin": ^8.19.1
     "@typescript-eslint/parser": ^8.19.1
     cookie: ^0.5.0
-    crypto-js: ^4.1.1
     eslint: ^9.17.0
     eslint-config-prettier: ^9.1.0
     eslint-config-standard-with-typescript: ^37.0.0
@@ -190,6 +190,15 @@ __metadata:
   version: 1.1.0
   resolution: "@rtsao/scc@npm:1.1.0"
   checksum: 17d04adf404e04c1e61391ed97bca5117d4c2767a76ae3e879390d6dec7b317fcae68afbf9e98badee075d0b64fa60f287729c4942021b4d19cd01db77385c01
+  languageName: node
+  linkType: hard
+
+"@types/cookie@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@types/cookie@npm:1.0.0"
+  dependencies:
+    cookie: "*"
+  checksum: fb0ad67988f3d3e4a181c7758f2db02e9b661d2e56b60256f5071a9458cf9e4425c18ce201c68f44d8022d0a5618f1f205db812ed28c3983c3579c759764d0b6
   languageName: node
   linkType: hard
 
@@ -659,6 +668,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie@npm:*":
+  version: 1.0.2
+  resolution: "cookie@npm:1.0.2"
+  checksum: 2c5a6214147ffa7135ce41860c781de17e93128689b0d080d3116468274b3593b607bcd462ac210d3a61f081db3d3b09ae106e18d60b1f529580e95cf2db8a55
+  languageName: node
+  linkType: hard
+
 "cookie@npm:^0.5.0":
   version: 0.5.0
   resolution: "cookie@npm:0.5.0"
@@ -674,13 +690,6 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 8d306efacaf6f3f60e0224c287664093fa9185680b2d195852ba9a863f85d02dcc737094c6e512175f8ee0161f9b87c73c6826034c2422e39de7d6569cf4503b
-  languageName: node
-  linkType: hard
-
-"crypto-js@npm:^4.1.1":
-  version: 4.2.0
-  resolution: "crypto-js@npm:4.2.0"
-  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 

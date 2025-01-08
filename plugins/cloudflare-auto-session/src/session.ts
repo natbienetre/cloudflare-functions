@@ -1,5 +1,5 @@
 import { parse } from 'cookie';
-import HmacSHA256 from 'crypto-js/hmac-sha256';
+import { createHmac } from 'node:crypto';
 
 import { Cookie } from './cookie';
 import type { CookieSpec, CookieData } from './types';
@@ -49,7 +49,9 @@ export class Session {
 
     const data = atob(parts[0]);
 
-    const signature = HmacSHA256(data, this.secret);
+    const signature = createHmac('sha256', this.secret)
+      .update(data)
+      .digest('base64');
 
     if (parts[1] !== btoa(signature)) {
       return false;
@@ -65,7 +67,9 @@ export class Session {
       this.name,
       (data?: CookieData): string => {
         const dataString = JSON.stringify(data);
-        const signature = HmacSHA256(dataString, this.secret);
+        const signature = createHmac('sha256', this.secret)
+          .update(data)
+          .digest('base64');
 
         return btoa(dataString) + '.' + btoa(signature);
       }

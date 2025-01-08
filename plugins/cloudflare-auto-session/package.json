@@ -2,7 +2,7 @@
   "name": "@natbienetre/cloudflare-auto-session",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "0.3.3-alpha4",
+  "version": "0.3.3-alpha5",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "type": "module",
@@ -20,13 +20,13 @@
     "dev": "npm run build"
   },
   "dependencies": {
-    "cookie": "^0.5.0",
-    "crypto-js": "^4.1.1"
+    "cookie": "^0.5.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.17.0",
+    "@types/cookie": "^1.0.0",
     "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",

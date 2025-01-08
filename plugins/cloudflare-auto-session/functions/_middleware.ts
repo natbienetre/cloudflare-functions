@@ -8,8 +8,8 @@ const allowedQuery = 'allowed';
 export const onRequestGet = (
   context: EventPluginContext<
     Record<string, string | undefined>,
-    any,
-    any,
+    string,
+    Record<string, unknown>,
     PluginArgs
   >
 ): Response | Promise<Response> => {
@@ -39,8 +39,8 @@ export const onRequestPost = ({
   pluginArgs,
 }: EventPluginContext<
   Record<string, string | undefined>,
-  any,
-  any,
+  string,
+  Record<string, unknown>,
   PluginArgs
 >): Response | Promise<Response> => {
   // Get the arguments given to the Plugin by the developer

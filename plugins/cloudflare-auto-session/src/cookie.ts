@@ -1,8 +1,4 @@
-import type { CookieSpec } from './types';
-
-export interface CookieData {
-  [key: string]: CookieData;
-}
+import type { CookieSpec, CookieData } from './types';
 
 export class Cookie {
   spec?: CookieSpec;

@@ -1,4 +1,6 @@
-import type { CookieData } from './cookie';
+export interface CookieData {
+  [key: string]: CookieData;
+}
 
 export interface CookieSpec {
   data?: CookieData;
@@ -18,9 +20,9 @@ export interface SessionSpec {
 }
 
 export interface PluginArgs {
-  cookieName?: string;
+  cookieName: string;
   cookieSecret: string;
   formAsset: string;
-  login?: (formdata: FormData) => Promise<SessionSpec>;
-  isValid?: (session: CookieData) => boolean;
+  login: (request: Request) => Promise<SessionSpec>;
+  isValid: (session: CookieData) => boolean;
 }

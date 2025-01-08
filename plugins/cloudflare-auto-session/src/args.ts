@@ -1,5 +1,4 @@
-import type { CookieData } from './cookie';
-import type { PluginArgs, SessionSpec } from './types';
+import type { PluginArgs, SessionSpec, CookieData } from './types';
 
 export interface PluginArgsWithDefaults {
   cookieName: string;

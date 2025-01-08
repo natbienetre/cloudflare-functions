@@ -1,9 +1,8 @@
 import { parse } from 'cookie';
 import HmacSHA256 from 'crypto-js/hmac-sha256';
 
-import type { CookieData } from './cookie';
 import { Cookie } from './cookie';
-import type { CookieSpec } from './types';
+import type { CookieSpec, CookieData } from './types';
 
 export class Session {
   name: string;
@@ -11,19 +10,19 @@ export class Session {
   isValid: (data: CookieData) => boolean;
 
   constructor(
-    name: string,
-    secret: string,
+    cookieName: string,
+    cookieSecret: string,
     isValid: (data: CookieData) => boolean
   ) {
-    if (name === '') {
+    if (cookieName === '') {
       throw new Error('Cookie name must be provided');
     }
-    if (secret === '') {
+    if (cookieSecret === '') {
       throw new Error('Cookie secret must be provided');
     }
 
-    this.name = name;
-    this.secret = secret;
+    this.name = cookieName;
+    this.secret = cookieSecret;
     this.isValid = isValid;
   }
 
@@ -64,7 +63,7 @@ export class Session {
 
     const setCookieHeader = cookie.headerSetCookie(
       this.name,
-      (data: CookieData): string => {
+      (data?: CookieData): string => {
         const dataString = JSON.stringify(data);
         const signature = HmacSHA256(dataString, this.secret);
 

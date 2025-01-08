@@ -5,14 +5,12 @@ import { withDefaults } from '../src/args';
 const authenticatedQuery = 'authenticated';
 const allowedQuery = 'allowed';
 
-export const onRequestGet = (
-  context: EventPluginContext<
-    Record<string, string | undefined>,
-    string,
-    Record<string, unknown>,
-    PluginArgs
-  >
-): Response | Promise<Response> => {
+export const onRequestGet: PagesPluginFunction<
+  unknown,
+  string,
+  Record<string, unknown>,
+  PluginArgs
+> = async context => {
   const { request, env, pluginArgs, next } = context;
 
   // Get the arguments given to the Plugin by the developer
@@ -34,15 +32,12 @@ export const onRequestGet = (
   return next();
 };
 
-export const onRequestPost = ({
-  request,
-  pluginArgs,
-}: EventPluginContext<
-  Record<string, string | undefined>,
+export const onRequestPost: PagesPluginFunction<
+  unknown,
   string,
   Record<string, unknown>,
   PluginArgs
->): Response | Promise<Response> => {
+> = async ({ request, pluginArgs }) => {
   // Get the arguments given to the Plugin by the developer
   const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs);
 

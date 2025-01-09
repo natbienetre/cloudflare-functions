@@ -9,7 +9,7 @@ export interface PluginArgsWithDefaults {
 }
 
 const Defaults = {
-  cookieName: 'cloudflare-plugin',
+  cookieName: 'cloudflare-auto-session',
   cookieSecret: 'secret',
   login: async (_: Request): Promise<SessionSpec> => {
     return {

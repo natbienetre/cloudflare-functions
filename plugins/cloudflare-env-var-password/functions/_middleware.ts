@@ -23,8 +23,12 @@ export const onRequest: PagesPluginFunction<
   const password = env[getEnvVarName(context)];
 
   if (password === undefined) {
+    console.error(`Password not found for ${context.request.url}`);
+
     return missingPasswordCallback(context);
   }
+
+  console.debug(`Password found for ${context.request.url}`);
 
   const auth = new Auth(
     context.request,

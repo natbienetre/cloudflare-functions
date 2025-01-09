@@ -39,6 +39,7 @@ export class Auth {
   }
 
   async verify(req: Request): Promise<boolean> {
+    console.debug(`Checking if ${req.url} is a trusted bot`);
     return this.verifiers
       .map(verif => verif(req))
       .reduce(
@@ -48,10 +49,12 @@ export class Auth {
   }
 
   isValid(data: CookieData): boolean {
+    console.debug(`Checking if ${data.path} is ${this.url.pathname}`);
     return data.path === this.url.pathname;
   }
 
   async expectedPasswordHash(): Promise<string> {
+    console.debug(`Computing hash for ${this.expectedPassword}`);
     return this.passwordEncodingMethod === undefined
       ? this.expectedPassword
       : crypto.subtle
@@ -75,7 +78,7 @@ export class Auth {
       return request.formData().then(async formData => {
         const password = formData.get(this.passwordFieldName);
 
-        if (password === null || password === undefined) {
+        if (password === null) {
           console.info('No password provided');
           return {
             authenticated: false,
@@ -83,8 +86,10 @@ export class Auth {
           };
         }
 
+        formData.delete(this.passwordFieldName);
+
         return this.expectedPasswordHash()
-          .then(hash => hash === this.expectedPassword)
+          .then(expectedPassword => expectedPassword === password)
           .then(passwordMatch => {
             if (!passwordMatch) {
               console.info('Password mismatch');

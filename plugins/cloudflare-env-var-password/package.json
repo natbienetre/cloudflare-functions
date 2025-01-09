@@ -2,7 +2,7 @@
   "name": "@natbienetre/cloudflare-env-var-password",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "0.2.0-beta12",
+  "version": "0.2.0-beta15",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "type": "module",
@@ -21,7 +21,7 @@
     "dev": "npm run build"
   },
   "dependencies": {
-    "@natbienetre/cloudflare-auto-session": "0.3.3-alpha5",
+    "@natbienetre/cloudflare-auto-session": "0.3.3-alpha6",
     "cidr-tools": "^11.0.2"
   },
   "devDependencies": {

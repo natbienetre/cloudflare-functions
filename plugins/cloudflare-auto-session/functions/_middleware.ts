@@ -54,12 +54,16 @@ export const onRequestPost: PagesPluginFunction<
 
   const url = new URL(request.url);
 
+  console.debug(`Logging in ${url.toString()}`);
+
   return login(request).then(
     ({ authenticated, allowed, cookie }: SessionSpec): Response => {
       url.searchParams.set(authenticatedQuery, authenticated.toString());
       url.searchParams.set(allowedQuery, allowed.toString());
 
       const destinationURL = url.toString();
+
+      console.info(`Session in ${destinationURL}`, authenticated, allowed, cookie);
 
       if (!authenticated) {
         console.debug('Authentication failure', url.toString());

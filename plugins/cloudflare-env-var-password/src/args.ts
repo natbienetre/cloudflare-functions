@@ -29,9 +29,6 @@ export interface PluginArgsWithDefaults {
 }
 
 export const Defaults = {
-  session: {
-    cookieName: 'cloudflare-plugin',
-  },
   getEnvVarName: (
     _: EventContext<
       Record<string, string | undefined>,

@@ -26,7 +26,7 @@ export const onRequest: PagesPluginFunction<
     return missingPasswordCallback(context);
   }
 
-  console.debug(`Password found for ${context.request.url}`);
+  console.debug(`Password found for ${context.request.url} in environment`);
 
   const auth = new Auth(
     context.request,

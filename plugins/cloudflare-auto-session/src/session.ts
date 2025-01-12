@@ -9,9 +9,9 @@ const signatureEncoding = 'hex'; // 'base64' is also an option
 const dataSeparator = '.';
 
 export class Session<Data extends CookieData> {
-  readonly cookieName: string;
   readonly cookieSecret: string;
   readonly isValid: (data: Data) => boolean;
+  readonly cookie: Cookie;
 
   constructor(
     cookieName: string,
@@ -25,7 +25,7 @@ export class Session<Data extends CookieData> {
       throw new Error('Cookie secret must be provided');
     }
 
-    this.cookieName = cookieName;
+    this.cookie = new Cookie(cookieName);
     this.cookieSecret = cookieSecret;
     this.isValid = isValid;
   }
@@ -38,7 +38,7 @@ export class Session<Data extends CookieData> {
 
     const cookies = parse(cookieHeader);
 
-    return cookies[this.cookieName];
+    return cookies[this.cookie.name];
   }
 
   valid(cookieString: string): boolean {
@@ -49,7 +49,7 @@ export class Session<Data extends CookieData> {
 
     const data = this.decodeData(encodedData);
 
-    console.debug('Checking cookie', this.cookieName, data);
+    console.debug('Checking cookie', this.cookie.name, data);
 
     if (data === undefined) {
       console.warn(`Invalid data.`);
@@ -71,13 +71,19 @@ export class Session<Data extends CookieData> {
   }
 
   private decodeData(dataString: string): Data | undefined {
-    const data = JSON.parse(atob(dataString));
+    try {
+      const data = JSON.parse(atob(dataString));
 
-    if (typeof data !== 'object') {
+      if (typeof data !== 'object') {
+        console.warn('Cookie data is not an object', data);
+        return undefined;
+      }
+
+      return data;
+    } catch (e) {
+      console.error('Error parsing cookie data', e);
       return undefined;
     }
-
-    return data;
   }
 
   private getSignature(data: CookieData): string {
@@ -87,27 +93,31 @@ export class Session<Data extends CookieData> {
   }
 
   start(request: Request, cookieSpec: CookieSpec<Data>): Response {
-    const cookie = new Cookie(cookieSpec);
-
     return new Response(`Logged in`, {
       status: 302,
       headers: {
         Location: request.url,
-        'Set-Cookie': cookie.setCookieHeader(
-          this.cookieName,
-          (data: Data): string =>
-            `${this.encodeData(data)}${dataSeparator}${this.getSignature(data)}`
+        'Set-Cookie': this.cookie.setCookieHeader(
+          `${this.encodeData(cookieSpec.data)}${dataSeparator}${this.getSignature(cookieSpec.data)}`,
+          cookieSpec.domain,
+          cookieSpec.path,
+          cookieSpec.expires,
+          cookieSpec.maxAge,
+          cookieSpec.secure,
+          cookieSpec.httpOnly,
+          cookieSpec.sameSite
         ),
       },
     });
   }
 
   end(response: Response): Response {
-    response.headers.append(
-      'Set-Cookie',
-      `${this.cookieName}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`
-    );
-    return response;
+    const newHeaders = new Headers(response.headers);
+    newHeaders.append('Set-Cookie', this.cookie.setCookieHeader());
+    return new Response(response.body, {
+      ...response,
+      headers: newHeaders,
+    });
   }
 }
 

@@ -128,12 +128,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha12":
-  version: 0.3.3-alpha12
-  resolution: "@natbienetre/cloudflare-auto-session@npm:0.3.3-alpha12"
+"@natbienetre/cloudflare-auto-session@npm:1.0.3":
+  version: 1.0.3
+  resolution: "@natbienetre/cloudflare-auto-session@npm:1.0.3"
   dependencies:
     cookie: ^1.0.2
-  checksum: a9139703208e508fdfc9139c7e300ddaf05d0274eae7bc8b37db9da1a85519bceb902be05495f3f7607f83ab6e71f449e4292085636ee029ba69782753c108a7
+  checksum: 3bc4d5a6f85261dd22c801666580114c68daaa26089bfd615b00d96cfb9f9c3167f4ad188573e1ae2da8dc21a44e3d0bc43c986a66ec8af8a4b63dbda78ec1a8
   languageName: node
   linkType: hard
 
@@ -144,7 +144,7 @@ __metadata:
     "@cloudflare/workers-types": ^4.20241230.0
     "@eslint/eslintrc": ^3.2.0
     "@eslint/js": ^9.17.0
-    "@natbienetre/cloudflare-auto-session": 0.3.3-alpha12
+    "@natbienetre/cloudflare-auto-session": 1.0.3
     "@types/node": ^22.10.5
     "@typescript-eslint/eslint-plugin": ^8.19.1
     "@typescript-eslint/parser": ^8.19.1

@@ -1,5 +1,5 @@
-import { Session } from '../src/session';
-import type { PluginArgs, SessionSpec } from '../src/types';
+import { serveForm, Session } from '../src/session';
+import type { CookieData, PluginArgs, SessionSpec } from '../src/types';
 import { withDefaults } from '../src/args';
 
 const authenticatedQuery = 'authenticated';
@@ -9,9 +9,9 @@ export const onRequestGet: PagesPluginFunction<
   unknown,
   string,
   Record<string, unknown>,
-  PluginArgs
+  PluginArgs<CookieData>
 > = async context => {
-  const { request, env, pluginArgs, next } = context;
+  const { request, pluginArgs, next } = context;
 
   // Get the arguments given to the Plugin by the developer
   const { cookieName, cookieSecret, formAsset, isValid } =
@@ -19,20 +19,14 @@ export const onRequestGet: PagesPluginFunction<
 
   const session = new Session(cookieName, cookieSecret, isValid);
 
-  if (!session.valid(request)) {
-    const url = new URL(request.url);
+  const cookie = session.getCookie(request);
+  if (cookie === undefined) {
+    return serveForm(formAsset)(context);
+  }
 
-    url.pathname = formAsset;
-
-    console.debug('Proxy to login form', url.toString());
-
-    return env.ASSETS.fetch(new Request(url, request)).then(
-      (response: Response) => {
-        // Expires the cookie from the response
-        response.headers.append('Set-Cookie', `${cookieName}=; Max-Age=0`);
-        return response;
-      }
-    );
+  if (!session.valid(cookie)) {
+    console.info('Invalid cookie');
+    return serveForm(formAsset)(context).then(session.end.bind(session));
   }
 
   // Cookie is valid
@@ -44,53 +38,35 @@ export const onRequestPost: PagesPluginFunction<
   unknown,
   string,
   Record<string, unknown>,
-  PluginArgs
+  PluginArgs<CookieData>
 > = async ({ request, pluginArgs }) => {
   // Get the arguments given to the Plugin by the developer
   const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs);
 
   const session = new Session(cookieName, cookieSecret, isValid);
 
-  if (session.valid(request)) {
-    console.debug('Already logged in', request.url);
-
-    return new Response('Already logged in', {
-      status: 302,
-      headers: {
-        Location: request.url,
-      },
-    });
-  }
-
-  const url = new URL(request.url);
-
-  console.debug(`Logging in ${url.toString()}`);
-
   return login(request).then(
-    ({ authenticated, allowed, cookie }: SessionSpec): Response => {
+    ({ authenticated, allowed, cookie }: SessionSpec<CookieData>): Response => {
+      const url = new URL(request.url);
+
       url.searchParams.set(authenticatedQuery, authenticated.toString());
       url.searchParams.set(allowedQuery, allowed.toString());
 
       const destinationURL = url.toString();
 
-      console.info(
-        `Session in ${destinationURL}`,
-        authenticated,
-        allowed,
-        cookie
-      );
-
       if (!authenticated) {
-        console.debug('Authentication failure', url.toString());
+        console.info('Authentication failure');
 
         return Response.redirect(destinationURL, 302);
       }
 
       if (!allowed) {
-        console.debug('Permission error', url.toString());
+        console.warn('Permission error');
 
         return Response.redirect(destinationURL, 302);
       }
+
+      console.info('Starting session');
 
       // Start a session with the cookie
       // Redirect to the original URL

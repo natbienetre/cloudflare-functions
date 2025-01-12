@@ -20,9 +20,6 @@ export default class IPsVerifier {
   constructor(url: string) {
     this.url = url;
     this.cache = caches.default;
-
-    this.check = this.check.bind(this);
-    this.parseResponse = this.parseResponse.bind(this);
   }
 
   async parseResponse(response: Response): Promise<IPsData> {

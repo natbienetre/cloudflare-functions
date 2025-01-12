@@ -1,13 +1,13 @@
 import type { CookieSpec, CookieData } from './types';
 
-export class Cookie {
-  spec?: CookieSpec;
+export class Cookie<Data extends CookieData = CookieData> {
+  readonly spec?: CookieSpec<Data>;
 
-  constructor(spec?: CookieSpec) {
+  constructor(spec?: CookieSpec<Data>) {
     this.spec = spec;
   }
 
-  headerSetCookie(name: string, encode: (data: CookieData) => string): string {
+  setCookieHeader(name: string, encode: (data: Data) => string): string {
     if (this.spec === undefined) return '';
 
     const value = encode(this.spec.data);
@@ -22,8 +22,8 @@ export class Cookie {
       this.spec.maxAge !== undefined
         ? 'Max-Age=' + this.spec.maxAge.toString()
         : '',
-      this.spec.secure !== undefined ? 'Secure' : '',
-      this.spec.httpOnly !== undefined ? 'HttpOnly' : '',
+      (this.spec.secure ?? false) ? 'Secure' : '',
+      (this.spec.httpOnly ?? false) ? 'HttpOnly' : '',
       this.spec.sameSite !== undefined ? 'SameSite=' + this.spec.sameSite : '',
     ];
 

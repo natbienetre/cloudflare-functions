@@ -1,8 +1,11 @@
-import type {
-  SessionSpec,
-  CookieData,
-} from '@natbienetre/cloudflare-auto-session';
+import type { CookieData as UntypedCookieData } from '@natbienetre/cloudflare-auto-session';
 import type { GoogleBot } from './google';
+
+export type CookieData = UntypedCookieData & {
+  path: string;
+  source: string;
+  userData?: FormData;
+};
 
 export type PasswordEncodingMethod =
   | string
@@ -17,8 +20,6 @@ export class AutoSessionArgs {
   cookieName?: string;
   cookieSecret?: string;
   formAsset?: string;
-  login?: (request: Request) => Promise<SessionSpec>;
-  isValid?: (session?: CookieData) => boolean;
 }
 
 export interface PluginArgs {

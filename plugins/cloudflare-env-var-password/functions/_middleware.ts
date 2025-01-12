@@ -1,6 +1,6 @@
 import autoSession from '@natbienetre/cloudflare-auto-session';
 
-import type { PluginArgs } from '../src/types';
+import type { PluginArgs, CookieData } from '../src/types';
 import { Auth } from '../src/authenticator';
 import { withDefaults } from '../src/args';
 
@@ -10,8 +10,6 @@ export const onRequest: PagesPluginFunction<
   Record<string, unknown>,
   PluginArgs
 > = async context => {
-  const { env } = context;
-
   const {
     passwordEncodingMethod,
     passwordFieldName,
@@ -20,9 +18,9 @@ export const onRequest: PagesPluginFunction<
     session,
     allowedBots,
   } = withDefaults(context.pluginArgs);
-  const password = env[getEnvVarName(context)];
+  const passwordHash = context.env[getEnvVarName(context)];
 
-  if (password === undefined) {
+  if (passwordHash === undefined) {
     console.error(`Password not found for ${context.request.url}`);
 
     return missingPasswordCallback(context);
@@ -32,14 +30,15 @@ export const onRequest: PagesPluginFunction<
 
   const auth = new Auth(
     context.request,
-    password,
+    passwordHash,
     passwordEncodingMethod,
     passwordFieldName,
     allowedBots
   );
 
-  session.isValid = auth.isValid;
-  session.login = auth.sessionData;
-
-  return autoSession(session)(context);
+  return autoSession<CookieData>({
+    ...session,
+    isValid: auth.isValid.bind(auth),
+    login: auth.sessionData.bind(auth),
+  })(context);
 };

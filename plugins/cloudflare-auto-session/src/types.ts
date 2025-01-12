@@ -1,7 +1,7 @@
-export type CookieData = Record<string, unknown>;
+export type CookieData = object;
 
-export interface CookieSpec {
-  data: CookieData;
+export interface CookieSpec<Data extends CookieData> {
+  data: Data;
   domain?: string;
   path?: string;
   expires?: Date;
@@ -11,16 +11,16 @@ export interface CookieSpec {
   sameSite?: 'Strict' | 'Lax' | 'None';
 }
 
-export interface SessionSpec {
+export interface SessionSpec<Data extends CookieData> {
   authenticated: boolean;
   allowed: boolean;
-  cookie?: CookieSpec;
+  cookie: CookieSpec<Data>;
 }
 
-export interface PluginArgs {
+export interface PluginArgs<Data extends CookieData> {
   cookieName: string;
   cookieSecret: string;
   formAsset: string;
-  login: (request: Request) => Promise<SessionSpec>;
-  isValid: (session: CookieData) => boolean;
+  login: (request: Request) => Promise<SessionSpec<Data>>;
+  isValid: (session: Data) => boolean;
 }

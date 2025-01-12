@@ -1,21 +1,21 @@
-import type {
-  SessionSpec,
-  CookieData,
+import {
+  type SessionSpec,
+  type CookieSpec,
 } from '@natbienetre/cloudflare-auto-session';
 
-import type { AllowedBots, PasswordEncodingMethod } from './types';
+import type { AllowedBots, PasswordEncodingMethod, CookieData } from './types';
 import { allBots } from './google';
 
 export class Auth {
   readonly passwordEncodingMethod: PasswordEncodingMethod;
   readonly passwordFieldName: string;
-  readonly expectedPassword: string;
+  readonly expectedPasswordHash: string;
   readonly url: URL;
   readonly verifiers: Array<(req: Request) => Promise<boolean>>;
 
   constructor(
     request: Request,
-    password: string,
+    passwordHash: string,
     passwordEncodingMethod: PasswordEncodingMethod,
     passwordFieldName: string,
     allowedBots: AllowedBots
@@ -23,7 +23,7 @@ export class Auth {
     this.url = new URL(request.url);
     this.passwordEncodingMethod = passwordEncodingMethod;
     this.passwordFieldName = passwordFieldName;
-    this.expectedPassword = password;
+    this.expectedPasswordHash = passwordHash;
     this.verifiers = [...allowedBots.google]
       .filter(value => value[1])
       .map(
@@ -31,15 +31,10 @@ export class Auth {
           allBots.get(value[0]) ??
           (async (_: Request): Promise<boolean> => false)
       );
-
-    this.verify = this.verify.bind(this);
-    this.sessionData = this.sessionData.bind(this);
-    this.isValid = this.isValid.bind(this);
-    this.expectedPasswordHash = this.expectedPasswordHash.bind(this);
   }
 
   async verify(req: Request): Promise<boolean> {
-    console.debug(`Checking if ${req.url} is a trusted bot`);
+    console.debug('Checking if client is a trusted bot', req.cf?.botManagement);
     return this.verifiers
       .map(verif => verif(req))
       .reduce(
@@ -48,35 +43,49 @@ export class Auth {
       );
   }
 
-  isValid(data?: CookieData): boolean {
-    if (data === undefined) {
-      console.debug('No data provided');
-      return false;
-    }
-
-    console.debug(`Checking if ${data.path} is ${this.url.pathname}`);
-    return data.path === this.url.pathname;
+  isValid(data: CookieData): boolean {
+    console.debug('Checking if data is valid for the current request', data);
+    return this.url.pathname.startsWith(data.path);
   }
 
-  async expectedPasswordHash(): Promise<string> {
-    console.debug(`Computing hash for ${this.expectedPassword}`);
+  async hashPassword(password: string): Promise<string> {
+    console.debug('Hashing password with method', this.passwordEncodingMethod);
     return this.passwordEncodingMethod === undefined
-      ? this.expectedPassword
+      ? password
       : crypto.subtle
           .digest(
             this.passwordEncodingMethod,
-            new TextEncoder().encode(this.expectedPassword)
+            new TextEncoder().encode(password)
           )
           .then(hash => btoa(String.fromCharCode(...new Uint8Array(hash))));
   }
 
-  async sessionData(request: Request): Promise<SessionSpec> {
-    this.verify(request).then(verified => {
+  private cookieSpec(
+    data: CookieData & { path?: string }
+  ): CookieSpec<CookieData> {
+    data.path = this.url.pathname;
+
+    return {
+      data: data,
+      path: this.url.pathname,
+      domain: this.url.hostname,
+      secure: this.url.protocol === 'https:',
+      httpOnly: true,
+      sameSite: 'Lax',
+    };
+  }
+
+  async sessionData(request: Request): Promise<SessionSpec<CookieData>> {
+    return this.verify(request).then(verified => {
       if (verified) {
         console.info('Trusted bot detected');
+
         return {
           authenticated: true,
           allowed: true,
+          cookie: this.cookieSpec({
+            source: 'trusted-bot',
+          }),
         };
       }
 
@@ -84,39 +93,47 @@ export class Auth {
         const password = formData.get(this.passwordFieldName);
 
         if (password === null) {
-          console.info('No password provided');
+          console.warn('No password provided');
+
           return {
             authenticated: false,
             allowed: false,
+            cookie: this.cookieSpec({
+              source: 'no-password',
+            }),
           };
         }
 
-        formData.delete(this.passwordFieldName);
-
-        return this.expectedPasswordHash()
-          .then(expectedPassword => expectedPassword === password)
+        return this.hashPassword(password)
+          .then(hashedPassword => this.expectedPasswordHash === hashedPassword)
           .then(passwordMatch => {
             if (!passwordMatch) {
-              console.info('Password mismatch');
+              console.warn(
+                `Password mismatch, expected ${this.expectedPasswordHash}`
+              );
 
               return {
                 authenticated: true,
-                allowed: passwordMatch,
+                allowed: false,
+                cookie: this.cookieSpec({
+                  source: 'invalid-password',
+                }),
               };
             }
 
             console.info('Password match');
 
+            // Remove the password from the form data
+            // before storing it in the cookie
+            formData.delete(this.passwordFieldName);
+
             return {
               authenticated: true,
               allowed: true,
-              cookie: {
-                data: {
-                  path: this.url.pathname,
-                  ...formData.entries(),
-                },
-                path: this.url.pathname,
-              },
+              cookie: this.cookieSpec({
+                source: 'user-form',
+                userData: formData,
+              }),
             };
           });
       });

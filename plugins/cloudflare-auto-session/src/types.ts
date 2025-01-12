@@ -1,9 +1,7 @@
-export interface CookieData {
-  [key: string]: CookieData;
-}
+export type CookieData = Record<string, unknown>;
 
 export interface CookieSpec {
-  data?: CookieData;
+  data: CookieData;
   domain?: string;
   path?: string;
   expires?: Date;

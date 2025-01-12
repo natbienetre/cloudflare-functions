@@ -7,7 +7,7 @@ export class Cookie {
     this.spec = spec;
   }
 
-  headerSetCookie(name: string, encode: (data?: CookieData) => string): string {
+  headerSetCookie(name: string, encode: (data: CookieData) => string): string {
     if (this.spec === undefined) return '';
 
     const value = encode(this.spec.data);

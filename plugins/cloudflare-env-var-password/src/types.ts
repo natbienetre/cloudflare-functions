@@ -18,7 +18,7 @@ export class AutoSessionArgs {
   cookieSecret?: string;
   formAsset?: string;
   login?: (request: Request) => Promise<SessionSpec>;
-  isValid?: (session: CookieData) => boolean;
+  isValid?: (session?: CookieData) => boolean;
 }
 
 export interface PluginArgs {

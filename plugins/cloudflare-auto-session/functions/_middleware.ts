@@ -26,9 +26,17 @@ export const onRequestGet: PagesPluginFunction<
 
     console.debug('Proxy to login form', url.toString());
 
-    return env.ASSETS.fetch(new Request(url, request));
+    return env.ASSETS.fetch(new Request(url, request)).then(
+      (response: Response) => {
+        // Expires the cookie from the response
+        response.headers.append('Set-Cookie', `${cookieName}=; Max-Age=0`);
+        return response;
+      }
+    );
   }
 
+  // Cookie is valid
+  // Continue to the next middleware
   return next();
 };
 
@@ -44,6 +52,8 @@ export const onRequestPost: PagesPluginFunction<
   const session = new Session(cookieName, cookieSecret, isValid);
 
   if (session.valid(request)) {
+    console.debug('Already logged in', request.url);
+
     return new Response('Already logged in', {
       status: 302,
       headers: {
@@ -63,7 +73,12 @@ export const onRequestPost: PagesPluginFunction<
 
       const destinationURL = url.toString();
 
-      console.info(`Session in ${destinationURL}`, authenticated, allowed, cookie);
+      console.info(
+        `Session in ${destinationURL}`,
+        authenticated,
+        allowed,
+        cookie
+      );
 
       if (!authenticated) {
         console.debug('Authentication failure', url.toString());
@@ -77,6 +92,9 @@ export const onRequestPost: PagesPluginFunction<
         return Response.redirect(destinationURL, 302);
       }
 
+      // Start a session with the cookie
+      // Redirect to the original URL
+      // Only when the user is authenticated and allowed
       return session.start(request, cookie);
     }
   );

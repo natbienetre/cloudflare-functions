@@ -48,7 +48,12 @@ export class Auth {
       );
   }
 
-  isValid(data: CookieData): boolean {
+  isValid(data?: CookieData): boolean {
+    if (data === undefined) {
+      console.debug('No data provided');
+      return false;
+    }
+
     console.debug(`Checking if ${data.path} is ${this.url.pathname}`);
     return data.path === this.url.pathname;
   }

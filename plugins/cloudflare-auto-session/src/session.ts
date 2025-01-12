@@ -4,6 +4,10 @@ import { createHmac } from 'node:crypto';
 import { Cookie } from './cookie';
 import type { CookieSpec, CookieData } from './types';
 
+const signatureAlgorithm = 'sha256';
+const signatureEncoding = 'hex'; // 'base64' is also an option
+const dataSeparator = '.';
+
 export class Session {
   name: string;
   secret: string;
@@ -41,41 +45,60 @@ export class Session {
       return false;
     }
 
-    const parts = cookie.split('.');
+    const [encodedData, encodedSignature] = cookie.split(dataSeparator, 2);
 
-    if (parts.length !== 2) {
+    const data = this.decodeData(encodedData) || {};
+
+    console.debug(`Checking cookie ${this.name} with data ${data}`);
+
+    if (encodedSignature !== this.getSignature(data)) {
+      console.warn(`Invalid signature for cookie ${this.name}`);
+
       return false;
     }
 
-    const data = atob(parts[0]);
+    return this.isValid(data);
+  }
 
-    const signature = createHmac('sha256', this.secret)
+  encodeData(data: CookieData): string {
+    return btoa(JSON.stringify(data));
+  }
+
+  decodeData(dataString: string): CookieData | undefined {
+    const data = JSON.parse(atob(dataString));
+
+    if (typeof data !== 'object') {
+      return undefined;
+    }
+
+    return data;
+  }
+
+  getSignature(data: CookieData): string {
+    return createHmac(signatureAlgorithm, this.secret)
       .update(data)
-      .digest('base64');
-
-    if (parts[1] !== btoa(signature)) {
-      return false;
-    }
-
-    return this.isValid(JSON.parse(data));
+      .digest(signatureEncoding);
   }
 
   start(request: Request, cookieSpec?: CookieSpec): Response {
+    if (cookieSpec === undefined) {
+      cookieSpec = {
+        data: {
+          path: new URL(request.url).pathname,
+        },
+      };
+    }
+
     const cookie = new Cookie(cookieSpec);
 
     const setCookieHeader = cookie.headerSetCookie(
       this.name,
-      (data?: CookieData): string => {
-        const dataString = JSON.stringify(data);
-        const signature = createHmac('sha256', this.secret)
-          .update(data)
-          .digest('base64');
-
-        return btoa(dataString) + '.' + btoa(signature);
+      (data: CookieData): string => {
+        return `${this.encodeData(data)}${dataSeparator}${this.getSignature(data)}`;
       }
     );
 
-    return new Response('', {
+    return new Response(`Logged in`, {
       status: 302,
       headers: {
         Location: request.url,
@@ -84,7 +107,13 @@ export class Session {
     });
   }
 
-  end(_: Request): Response {
-    throw new Error('Not implemented');
+  end(request: Request): Response {
+    return new Response(`Logged in`, {
+      status: 302,
+      headers: {
+        Location: request.url,
+        'Set-Cookie': `${this.name}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict`,
+      },
+    });
   }
 }

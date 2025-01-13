@@ -1,68 +1,91 @@
-import { Session } from '../src/session'
-import type { PluginArgs, SessionSpec } from '../src/types'
-import { withDefaults } from '../src/args'
+import { serveForm, Session } from '../src/session';
+import type { CookieData, PluginArgs, SessionSpec } from '../src/types';
+import { withDefaults } from '../src/args';
 
-const authenticatedQuery = 'authenticated'
-const allowedQuery = 'allowed'
+const authenticatedQuery = 'authenticated';
+const allowedQuery = 'allowed';
 
-export const onRequestGet = (context: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Response | Promise<Response> => {
-  const { request, env, pluginArgs, next } = context
+export const onRequestGet: PagesPluginFunction<
+  unknown,
+  string,
+  Record<string, unknown>,
+  PluginArgs<CookieData>
+> = async context => {
+  const { request, pluginArgs, next } = context;
 
   // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, formAsset, isValid } = withDefaults(pluginArgs)
+  const { cookieName, cookieSecret, formAsset, isValid, byPass } =
+    withDefaults(pluginArgs);
 
-  const session = new Session(cookieName, cookieSecret, isValid)
+  const session = new Session(cookieName, cookieSecret, isValid);
 
-  if (!session.valid(request)) {
-    const url = new URL(request.url)
-
-    url.pathname = formAsset
-
-    console.debug('Proxy to login form', url.toString())
-
-    return env.ASSETS.fetch(new Request(url, request))
-  }
-
-  return next()
-}
-
-export const onRequestPost = ({ request, pluginArgs }: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Response | Promise<Response> => {
-  // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs)
-
-  const session = new Session(cookieName, cookieSecret, isValid)
-
-  if (session.valid(request)) {
-    return new Response('Already logged in', {
-      status: 302,
-      headers: {
-        Location: request.url
+  return [
+    byPass,
+    async (request: Request): Promise<boolean> => {
+      const cookie = session.getCookie(request);
+      if (cookie === undefined) {
+        return false;
       }
-    })
-  }
 
-  const url = new URL(request.url)
+      if (!session.valid(cookie)) {
+        console.info('Invalid cookie');
+        return false;
+      }
 
-  return request.formData()
-    .then(login)
-    .then(({ authenticated, allowed, cookie }: SessionSpec): Response => {
-      url.searchParams.set(authenticatedQuery, authenticated.toString())
-      url.searchParams.set(allowedQuery, allowed.toString())
+      return true;
+    },
+  ]
+    .map(fn => fn(request))
+    .reduce((acc, curr) => acc.then(acc => acc || curr), Promise.resolve(false))
+    .then(trusted => {
+      if (!trusted) {
+        return serveForm(formAsset)(context);
+      }
 
-      const destinationURL = url.toString()
+      // Continue to the next middleware
+      return next();
+    });
+};
+
+export const onRequestPost: PagesPluginFunction<
+  unknown,
+  string,
+  Record<string, unknown>,
+  PluginArgs<CookieData>
+> = async ({ request, pluginArgs }) => {
+  // Get the arguments given to the Plugin by the developer
+  // AllowedBot is not used for POST requests
+  const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs);
+
+  const session = new Session(cookieName, cookieSecret, isValid);
+
+  return login(request).then(
+    ({ authenticated, allowed, cookie }: SessionSpec<CookieData>): Response => {
+      const url = new URL(request.url);
+
+      url.searchParams.set(authenticatedQuery, authenticated.toString());
+      url.searchParams.set(allowedQuery, allowed.toString());
+
+      const destinationURL = url.toString();
 
       if (!authenticated) {
-        console.debug('Authentication failure', url.toString())
+        console.info('Authentication failure');
 
-        return Response.redirect(destinationURL, 302)
+        return Response.redirect(destinationURL, 302);
       }
 
       if (!allowed) {
-        console.debug('Permission error', url.toString())
+        console.warn('Permission error');
 
-        return Response.redirect(destinationURL, 302)
+        return Response.redirect(destinationURL, 302);
       }
 
-      return session.start(request, cookie)
-    })
-}
+      console.info('Starting session');
+
+      // Start a session with the cookie
+      // Redirect to the original URL
+      // Only when the user is authenticated and allowed
+      return session.start(request, cookie);
+    }
+  );
+};

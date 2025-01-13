@@ -1,16 +1,10 @@
 {
-    "compilerOptions": {
-      "baseUrl": "./",
-      "target": "esnext",
-      "module": "esnext",
-      "lib": ["esnext"],
-      "types": ["@cloudflare/workers-types"],
-      "strictNullChecks": true,
-      "paths": {
-        "crypto": [
-          "node_modules/crypto-js"
-        ]
-      },
-      "moduleResolution": "node"
-    }
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "lib": ["esnext"],
+    "types": ["@cloudflare/workers-types"],
+    "strictNullChecks": true,
+    "moduleResolution": "node"
+  }
 }

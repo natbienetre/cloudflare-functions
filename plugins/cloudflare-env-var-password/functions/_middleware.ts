@@ -1,16 +1,42 @@
-import autoSession from '@natbienetre/cloudflare-auto-session'
+import autoSession from '@natbienetre/cloudflare-auto-session';
 
-import type { PluginArgs } from '../src/types'
-import { Auth } from '../src/authenticator'
-import { withDefaults } from '../src/args'
+import type { PluginArgs, CookieData } from '../src/types';
+import { Auth } from '../src/authenticator';
+import { withDefaults } from '../src/args';
 
-export const onRequest = (context: EventPluginContext<Record<string, string | undefined>, any, any, PluginArgs>): Response | Promise<Response> => {
-  const { passwordEncodingMethod, passwordFieldName, getEnvVarName } = withDefaults(context.pluginArgs)
-  const auth = new Auth(context.request, context.env, getEnvVarName(context), passwordEncodingMethod, passwordFieldName)
+export const onRequest: PagesPluginFunction<
+  Record<string, string | undefined>,
+  string,
+  Record<string, unknown>,
+  PluginArgs
+> = async context => {
+  const {
+    passwordEncodingMethod,
+    passwordFieldName,
+    getEnvVarName,
+    missingPasswordCallback,
+    session,
+  } = withDefaults(context.pluginArgs);
+  const passwordHash = context.env[getEnvVarName(context)];
 
-  return autoSession({
-    secret: context.env.SECRET,
-    login: auth.sessionData,
-    isValid: auth.isValid
-  })(context)
-}
+  if (passwordHash === undefined) {
+    console.error(`Password not found for ${context.request.url}`);
+
+    return missingPasswordCallback(context);
+  }
+
+  console.debug(`Password found for ${context.request.url} in environment`);
+
+  const auth = new Auth(
+    context.request,
+    passwordHash,
+    passwordEncodingMethod,
+    passwordFieldName
+  );
+
+  return autoSession<CookieData>({
+    ...session,
+    isValid: auth.isValid.bind(auth),
+    login: auth.sessionData.bind(auth),
+  })(context);
+};

@@ -1,29 +1,42 @@
-import type { PluginArgs, SessionSpec } from './types'
+import type { PluginArgs, SessionSpec, CookieData } from './types';
 
-export interface PluginArgsWithDefaults {
-  cookieName: string
-  cookieSecret: string
-  formAsset: string
-  login: (formdata: FormData) => SessionSpec
-  isValid: (data: any) => boolean
+export interface PluginArgsWithDefaults<Data extends CookieData> {
+  cookieName: string;
+  cookieSecret: string;
+  formAsset: string;
+  byPass(request: Request): Promise<boolean>;
+  login: (request: Request) => Promise<SessionSpec<Data>>;
+  isValid: (data: Data) => boolean;
 }
 
 const Defaults = {
-  cookieName: 'cloudflare-plugin',
+  byPass: (_: Request): Promise<boolean> => Promise.resolve(false),
+  cookieName: 'cloudflare-auto-session',
   cookieSecret: 'secret',
-  login: (_: FormData): SessionSpec => {
+  login: async (request: Request): Promise<SessionSpec<CookieData>> => {
+    const url = new URL(request.url);
     return {
       authenticated: false,
-      allowed: false
-    }
+      allowed: false,
+      cookie: {
+        path: url.pathname,
+        domain: url.hostname,
+        secure: url.protocol === 'https:',
+        httpOnly: true,
+        sameSite: 'Lax',
+        data: {},
+      },
+    };
   },
   formAsset: '/nbe-login/',
-  isValid: (_: any): boolean => true
-}
+  isValid: (_: CookieData): boolean => true,
+};
 
-export function withDefaults (args: PluginArgs): PluginArgsWithDefaults {
+export function withDefaults<Data extends CookieData>(
+  args: PluginArgs<Data>
+): PluginArgsWithDefaults<Data> {
   return {
     ...Defaults,
-    ...args
-  }
+    ...args,
+  } as PluginArgsWithDefaults<Data>;
 }

@@ -1,92 +1,108 @@
-import type { SessionSpec } from '@natbienetre/cloudflare-auto-session'
+import {
+  type SessionSpec,
+  type CookieSpec,
+} from '@natbienetre/cloudflare-auto-session';
 
-import type { PasswordEncodingMethod } from './types'
+import type { PasswordEncodingMethod, CookieData } from './types';
 
 export class Auth {
-  env: Record<string, string | undefined>
-  passwordEncodingMethod: PasswordEncodingMethod
-  passwordFieldName: string
-  envVarName: string
-  url: URL
+  readonly passwordEncodingMethod: PasswordEncodingMethod;
+  readonly passwordFieldName: string;
+  readonly expectedPasswordHash: string;
+  readonly url: URL;
 
-  constructor (
+  constructor(
     request: Request,
-    env: Record<string, string | undefined>,
-    envVarName: string,
+    passwordHash: string,
     passwordEncodingMethod: PasswordEncodingMethod,
     passwordFieldName: string
   ) {
-    this.env = env
-    this.url = new URL(request.url)
-    this.passwordEncodingMethod = passwordEncodingMethod
-    this.passwordFieldName = passwordFieldName
-    this.envVarName = envVarName
-
-    this.getExpectedPassword = this.getExpectedPassword.bind(this)
-    this.sessionData = this.sessionData.bind(this)
-    this.isValid = this.isValid.bind(this)
+    this.url = new URL(request.url);
+    this.passwordEncodingMethod = passwordEncodingMethod;
+    this.passwordFieldName = passwordFieldName;
+    this.expectedPasswordHash = passwordHash;
   }
 
-  getExpectedPassword (): string {
-    const expected = this.env[this.envVarName]
-
-    if (expected === undefined) {
-      throw new Error(`Variable '${this.envVarName}' not found`)
-    }
-
-    return expected
+  isValid(data: CookieData): boolean {
+    console.debug('Checking if data is valid for the current request', data);
+    return this.url.pathname.startsWith(data.path);
   }
 
-  isValid (data: any): boolean {
-    return data.path === this.url.pathname
+  async hashPassword(password: string): Promise<string> {
+    console.debug('Hashing password with method', this.passwordEncodingMethod);
+    return this.passwordEncodingMethod === undefined
+      ? password
+      : crypto.subtle
+          .digest(
+            this.passwordEncodingMethod,
+            new TextEncoder().encode(password)
+          )
+          .then(hash => btoa(String.fromCharCode(...new Uint8Array(hash))));
   }
 
-  async sessionData (formData: FormData): Promise<SessionSpec> {
-    const expected = this.getExpectedPassword()
-    const password = formData.get(this.passwordFieldName)
+  private cookieSpec(
+    data: CookieData & { path?: string }
+  ): CookieSpec<CookieData> {
+    data.path = this.url.pathname;
 
-    if (password === null || password === undefined) {
-      return {
-        authenticated: false,
-        allowed: false
-      }
-    }
+    return {
+      data: data,
+      path: this.url.pathname,
+      domain: this.url.hostname,
+      secure: this.url.protocol === 'https:',
+      httpOnly: true,
+      sameSite: 'Lax',
+    };
+  }
 
-    formData.delete(this.passwordFieldName)
+  async sessionData(request: Request): Promise<SessionSpec<CookieData>> {
+    return request.formData().then(async formData => {
+      const password = formData.get(this.passwordFieldName);
 
-    let hash: Promise<string | null>
+      if (password === null) {
+        console.warn('No password provided');
 
-    switch (this.passwordEncodingMethod) {
-      case '':
-        hash = Promise.resolve(password)
-        break
-      default:
-        hash = crypto.subtle.digest(this.passwordEncodingMethod, new TextEncoder().encode(password)).then((hash) => {
-          return btoa(String.fromCharCode(...new Uint8Array(hash)))
-        })
-    }
-
-    return await hash.then((hash: string): SessionSpec => {
-      const passwordMatch = hash === expected
-
-      if (!passwordMatch) {
         return {
-          authenticated: true,
-          allowed: passwordMatch
-        }
+          authenticated: false,
+          allowed: false,
+          cookie: this.cookieSpec({
+            source: 'no-password',
+          }),
+        };
       }
 
-      return {
-        authenticated: true,
-        allowed: true,
-        cookie: {
-          data: {
-            path: this.url.pathname,
-            ...formData.entries()
-          },
-          path: this.url.pathname
-        }
-      }
-    })
+      return this.hashPassword(password)
+        .then(hashedPassword => this.expectedPasswordHash === hashedPassword)
+        .then(passwordMatch => {
+          if (!passwordMatch) {
+            console.warn(
+              `Password mismatch, expected ${this.expectedPasswordHash}`
+            );
+
+            return {
+              authenticated: true,
+              allowed: false,
+              cookie: this.cookieSpec({
+                source: 'invalid-password',
+              }),
+            };
+          }
+
+          console.info('Password match');
+
+          // Remove the password from the form data
+          // before storing it in the cookie
+          formData.delete(this.passwordFieldName);
+
+          return {
+            authenticated: true,
+            allowed: true,
+            cookie: this.cookieSpec({
+              source: 'user-form',
+              userData: formData,
+            }),
+          };
+        });
+    });
   }
 }

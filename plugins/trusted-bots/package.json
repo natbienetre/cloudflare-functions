@@ -1,32 +1,29 @@
 {
-  "name": "@natbienetre/cloudflare-auto-session",
+  "name": "@natbienetre/trusted-bots",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "2.1.1",
+  "version": "0.0.18",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "type": "module",
   "files": [
-    "dist",
-    "index.d.ts",
-    "tsconfig.json"
+    "dist"
   ],
   "scripts": {
-    "build": "npx wrangler pages functions build --plugin --outdir=dist --sourcemap --minify",
+    "build": "npx tsc --project tsconfig.json",
     "prepare": "npm run build",
     "format": "prettier --check --write \"**/*.{ts,js,mjs,json,md}\"",
     "prettier": "prettier --check \"**/*.{ts,js,mjs,json,md}\"",
     "lint": "eslint .",
-    "dev": "npm run build"
+    "dev": "npx tsc --project tsconfig.json --watch"
   },
   "dependencies": {
-    "cookie": "^1.0.2"
+    "cidr-tools": "^11.0.2"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241230.0",
+    "@cloudflare/workers-types": "^4.20250109.0",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.17.0",
-    "@types/cookie": "^1.0.0",
     "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",

@@ -1,22 +1,53 @@
-import type { PluginArgs, PasswordEncodingMethod } from './types'
+import type {
+  PluginArgs,
+  AutoSessionArgs,
+  PasswordEncodingMethod,
+} from './types';
 
 export interface PluginArgsWithDefaults {
-  cookieName: string
-  getEnvVarName: (context: EventContext<any, any, any>) => string
-  passwordEncodingMethod: PasswordEncodingMethod
-  passwordFieldName: string
+  session: AutoSessionArgs;
+
+  getEnvVarName: (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ) => string;
+  passwordEncodingMethod: PasswordEncodingMethod;
+  passwordFieldName: string;
+  missingPasswordCallback: (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ) => Promise<Response>;
 }
 
 export const Defaults = {
-  cookieName: 'cloudflare-plugin',
-  getEnvVarName: (_: EventContext<any, any, any>): string => 'CREDENTIALS',
-  passwordEncodingMethod: '',
-  passwordFieldName: 'password'
-}
+  getEnvVarName: (
+    _: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ): string => 'CREDENTIALS',
+  passwordFieldName: 'password',
+  missingPasswordCallback: async (
+    context: EventContext<
+      Record<string, string | undefined>,
+      string,
+      Record<string, unknown>
+    >
+  ): Promise<Response> => {
+    throw new Error(`Missing password for ${context.request.url}`);
+  },
+};
 
-export function withDefaults (args: PluginArgs): PluginArgsWithDefaults {
+export function withDefaults(args: PluginArgs): PluginArgsWithDefaults {
   return {
     ...Defaults,
-    ...args
-  }
+    ...args,
+  };
 }

@@ -1,79 +1,146 @@
-import { parse } from 'cookie'
-import HmacSHA256 from 'crypto-js/hmac-sha256'
+import { parse } from 'cookie';
+import { createHmac } from 'node:crypto';
 
-import { Cookie } from './cookie'
-import type { CookieSpec } from './types'
+import { Cookie } from './cookie';
+import type { CookieSpec, CookieData, PluginArgs } from './types';
 
-export class Session {
-  name: string
-  secret: string
-  isValid: (data: any) => boolean
+const signatureAlgorithm = 'sha256';
+const signatureEncoding = 'hex'; // 'base64' is also an option
+const dataSeparator = '.';
 
-  constructor (name: string, secret: string, isValid: (data: any) => boolean) {
-    if (name === '') {
-      throw new Error('Cookie name must be provided')
+export class Session<Data extends CookieData> {
+  readonly cookieSecret: string;
+  readonly isValid: (data: Data) => boolean;
+  readonly cookie: Cookie;
+
+  constructor(
+    cookieName: string,
+    cookieSecret: string,
+    isValid: (data: Data) => boolean
+  ) {
+    if (cookieName === '') {
+      throw new Error('Cookie name must be provided');
     }
-    if (secret === '') {
-      throw new Error('Cookie secret must be provided')
+    if (cookieSecret === '') {
+      throw new Error('Cookie secret must be provided');
     }
 
-    this.name = name
-    this.secret = secret
-    this.isValid = isValid
+    this.cookie = new Cookie(cookieName);
+    this.cookieSecret = cookieSecret;
+    this.isValid = isValid;
   }
 
-  valid (request: Request): boolean {
-    const cookieHeader = request.headers?.get('Cookie')
+  getCookie(request: Request): string | undefined {
+    const cookieHeader = request.headers?.get('Cookie');
     if (cookieHeader === null) {
-      return false
+      return undefined;
     }
 
-    const cookies = parse(cookieHeader)
+    const cookies = parse(cookieHeader);
 
-    const cookie = cookies[this.name]
-    if (cookie === undefined) {
-      console.debug(`Cookie ${this.name} not found`)
-
-      return false
-    }
-
-    const parts = cookie.split('.')
-
-    if (parts.length !== 2) {
-      return false
-    }
-
-    const data = atob(parts[0])
-
-    const signature = HmacSHA256(data, this.secret)
-
-    if (parts[1] !== btoa(signature)) {
-      return false
-    }
-
-    return this.isValid(JSON.parse(data))
+    return cookies[this.cookie.name];
   }
 
-  start (request: Request, cookieSpec?: CookieSpec): Response {
-    const cookie = new Cookie(cookieSpec)
+  valid(cookieString: string): boolean {
+    const [encodedData, encodedSignature] = cookieString.split(
+      dataSeparator,
+      2
+    );
 
-    const setCookieHeader = cookie.headerSetCookie(this.name, (data: any): string => {
-      const dataString = JSON.stringify(data)
-      const signature = HmacSHA256(dataString, this.secret)
+    const data = this.decodeData(encodedData);
 
-      return btoa(dataString) + '.' + btoa(signature)
-    })
+    console.debug('Checking cookie', this.cookie.name, data);
 
-    return new Response('', {
+    if (data === undefined) {
+      console.warn(`Invalid data.`);
+
+      return false;
+    }
+
+    if (encodedSignature !== this.getSignature(data)) {
+      console.warn(`Invalid signature for cookie`);
+
+      return false;
+    }
+
+    return this.isValid(data);
+  }
+
+  private encodeData(data: Data): string {
+    return btoa(JSON.stringify(data));
+  }
+
+  private decodeData(dataString: string): Data | undefined {
+    try {
+      const data = JSON.parse(atob(dataString));
+
+      if (typeof data !== 'object') {
+        console.warn('Cookie data is not an object', data);
+        return undefined;
+      }
+
+      return data;
+    } catch (e) {
+      console.error('Error parsing cookie data', e);
+      return undefined;
+    }
+  }
+
+  private getSignature(data: CookieData): string {
+    return createHmac(signatureAlgorithm, this.cookieSecret)
+      .update(JSON.stringify(data))
+      .digest(signatureEncoding);
+  }
+
+  start(request: Request, cookieSpec: CookieSpec<Data>): Response {
+    return new Response(`Logged in`, {
       status: 302,
       headers: {
         Location: request.url,
-        'Set-Cookie': setCookieHeader
-      }
-    })
+        'Set-Cookie': this.cookie.setCookieHeader(
+          `${this.encodeData(cookieSpec.data)}${dataSeparator}${this.getSignature(cookieSpec.data)}`,
+          cookieSpec.domain,
+          cookieSpec.path,
+          cookieSpec.expires,
+          cookieSpec.maxAge,
+          cookieSpec.secure,
+          cookieSpec.httpOnly,
+          cookieSpec.sameSite
+        ),
+      },
+    });
   }
 
-  end (_: Request): Response {
-    throw new Error('Not implemented')
+  end(response: Response): Response {
+    const newHeaders = new Headers(response.headers);
+    newHeaders.append('Set-Cookie', this.cookie.setCookieHeader());
+    return new Response(response.body, {
+      ...response,
+      headers: newHeaders,
+    });
   }
 }
+
+export const serveForm = (
+  assetPath: string
+): (({
+  request,
+  env,
+  pluginArgs,
+  next,
+}: EventPluginContext<
+  unknown,
+  string,
+  Record<string, unknown>,
+  PluginArgs<CookieData>
+>) => Promise<Response>) => {
+  return async ({ request, env }): Promise<Response> => {
+    const url = new URL(request.url);
+
+    url.pathname = assetPath;
+
+    console.info('Serving the login form', url.toString());
+
+    return env.ASSETS.fetch(new Request(url, request));
+  };
+};

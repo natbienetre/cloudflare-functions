@@ -5,10 +5,10 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"@cloudflare/workers-types@npm:^4.20241230.0":
-  version: 4.20241230.0
-  resolution: "@cloudflare/workers-types@npm:4.20241230.0"
-  checksum: ff2a7a3ab40ae321509e98400b5cc6ed4f614a41b037ffd2a1c4f26ecb886e1b6de5d26322a721952bf20d9c9618d3fa7b5fed6cc63684b07d003d2d47ba3b3e
+"@cloudflare/workers-types@npm:^4.20250109.0":
+  version: 4.20250109.0
+  resolution: "@cloudflare/workers-types@npm:4.20250109.0"
+  checksum: 4505e0868979845db7422bb9743c8e1c118360ba79cc7a43ecca1c85cab47078c9bad1a0f3ff6c49bf4576592cc7e396a50d1a5d2947e4c438e3c9718f57ba88
   languageName: node
   linkType: hard
 
@@ -128,26 +128,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@natbienetre/cloudflare-auto-session@npm:2.1.1":
-  version: 2.1.1
-  resolution: "@natbienetre/cloudflare-auto-session@npm:2.1.1"
-  dependencies:
-    cookie: ^1.0.2
-  checksum: c60a9ccb575ec6928fd6051f11147d70bbeece6df0d1a5c440acfe90cf480394a3979a7560c69d0388203bfabe4522ca4b369040b523c69aaec9bbffcc9e336d
-  languageName: node
-  linkType: hard
-
-"@natbienetre/cloudflare-env-var-password@workspace:.":
+"@natbienetre/trusted-bots@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@natbienetre/cloudflare-env-var-password@workspace:."
+  resolution: "@natbienetre/trusted-bots@workspace:."
   dependencies:
-    "@cloudflare/workers-types": ^4.20241230.0
+    "@cloudflare/workers-types": ^4.20250109.0
     "@eslint/eslintrc": ^3.2.0
     "@eslint/js": ^9.17.0
-    "@natbienetre/cloudflare-auto-session": 2.1.1
     "@types/node": ^22.10.5
     "@typescript-eslint/eslint-plugin": ^8.19.1
     "@typescript-eslint/parser": ^8.19.1
+    cidr-tools: ^11.0.2
     eslint: ^9.17.0
     eslint-config-prettier: ^9.1.0
     eslint-config-standard-with-typescript: ^37.0.0
@@ -644,6 +635,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cidr-tools@npm:^11.0.2":
+  version: 11.0.2
+  resolution: "cidr-tools@npm:11.0.2"
+  dependencies:
+    ip-bigint: ^8.2.0
+  checksum: 2f02d99b7e69595c4937098a4ece8e63f70b41baad6f7033cad7be926cabe1e2f1fd8df5f4975fda4488f9e960b387b7874e85075e311e8e58c8f73b9df79702
+  languageName: node
+  linkType: hard
+
 "color-convert@npm:^2.0.1":
   version: 2.0.1
   resolution: "color-convert@npm:2.0.1"
@@ -664,13 +664,6 @@ __metadata:
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
   checksum: 902a9f5d8967a3e2faf138d5cb784b9979bad2e6db5357c5b21c568df4ebe62bcb15108af1b2253744844eb964fc023fbd9afbbbb6ddd0bcc204c6fb5b7bf3af
-  languageName: node
-  linkType: hard
-
-"cookie@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "cookie@npm:1.0.2"
-  checksum: 2c5a6214147ffa7135ce41860c781de17e93128689b0d080d3116468274b3593b607bcd462ac210d3a61f081db3d3b09ae106e18d60b1f529580e95cf2db8a55
   languageName: node
   linkType: hard
 
@@ -1541,6 +1534,13 @@ __metadata:
     hasown: ^2.0.2
     side-channel: ^1.1.0
   checksum: 8e0991c2d048cc08dab0a91f573c99f6a4215075887517ea4fa32203ce8aea60fa03f95b177977fa27eb502e5168366d0f3e02c762b799691411d49900611861
+  languageName: node
+  linkType: hard
+
+"ip-bigint@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "ip-bigint@npm:8.2.0"
+  checksum: e877e4f8447800ce08e0202daffbfb7b865deae7dadbbeddf02e3f4b9584134665cd45417a31f9de5159610ebcba594d6bf8e63c3cebe26fbc86761c0c1c8647
   languageName: node
   linkType: hard
 

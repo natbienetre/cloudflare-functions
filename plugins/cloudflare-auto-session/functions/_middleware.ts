@@ -14,24 +14,37 @@ export const onRequestGet: PagesPluginFunction<
   const { request, pluginArgs, next } = context;
 
   // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, formAsset, isValid } =
+  const { cookieName, cookieSecret, formAsset, isValid, byPass } =
     withDefaults(pluginArgs);
 
   const session = new Session(cookieName, cookieSecret, isValid);
 
-  const cookie = session.getCookie(request);
-  if (cookie === undefined) {
-    return serveForm(formAsset)(context);
-  }
+  return [
+    byPass,
+    async (request: Request): Promise<boolean> => {
+      const cookie = session.getCookie(request);
+      if (cookie === undefined) {
+        return false;
+      }
 
-  if (!session.valid(cookie)) {
-    console.info('Invalid cookie');
-    return serveForm(formAsset)(context).then(session.end.bind(session));
-  }
+      if (!session.valid(cookie)) {
+        console.info('Invalid cookie');
+        return false;
+      }
 
-  // Cookie is valid
-  // Continue to the next middleware
-  return next();
+      return true;
+    },
+  ]
+    .map(fn => fn(request))
+    .reduce((acc, curr) => acc.then(acc => acc || curr), Promise.resolve(false))
+    .then(trusted => {
+      if (!trusted) {
+        return serveForm(formAsset)(context);
+      }
+
+      // Continue to the next middleware
+      return next();
+    });
 };
 
 export const onRequestPost: PagesPluginFunction<
@@ -41,6 +54,7 @@ export const onRequestPost: PagesPluginFunction<
   PluginArgs<CookieData>
 > = async ({ request, pluginArgs }) => {
   // Get the arguments given to the Plugin by the developer
+  // AllowedBot is not used for POST requests
   const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs);
 
   const session = new Session(cookieName, cookieSecret, isValid);

@@ -2,7 +2,7 @@
   "name": "@natbienetre/cloudflare-env-var-password",
   "main": "dist/index.js",
   "types": "index.d.ts",
-  "version": "0.2.4",
+  "version": "1.1.1",
   "license": "MPL-2.0",
   "funding": "https://github.com/sponsors/holyhope",
   "type": "module",
@@ -12,7 +12,7 @@
     "tsconfig.json"
   ],
   "scripts": {
-    "build": "npx wrangler pages functions build --plugin --outdir=dist",
+    "build": "npx wrangler pages functions build --plugin --outdir=dist --sourcemap --minify",
     "prepare": "npm run build",
     "format": "prettier --check --write \"**/*.{ts,js,mjs,json,md}\"",
     "prettier": "prettier --check \"**/*.{ts,js,mjs,json,md}\"",
@@ -21,8 +21,7 @@
     "dev": "npm run build"
   },
   "dependencies": {
-    "@natbienetre/cloudflare-auto-session": "1.0.5",
-    "cidr-tools": "^11.0.2"
+    "@natbienetre/cloudflare-auto-session": "2.1.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241230.0",
@@ -40,5 +39,6 @@
     "eslint-plugin-promise": "^6.0.0",
     "prettier": "^3.4.2",
     "typescript": "*"
-  }
+  },
+  "packageManager": "yarn@3.6.3+sha512.d432ab8b22b89cb8b46649ebaf196159b0c1870904224771d75fdf8b55490aaa5de4d9f028deb0425f1513bff7843e97b9d117103795a23b12d2e7c1cedcf50f"
 }

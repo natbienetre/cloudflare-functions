@@ -139,7 +139,7 @@ export const serveForm = (
 
     url.pathname = assetPath;
 
-    console.debug('Redirecting to login form', url.toString());
+    console.info('Serving the login form', url.toString());
 
     return env.ASSETS.fetch(new Request(url, request));
   };

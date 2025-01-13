@@ -16,7 +16,6 @@ export const onRequest: PagesPluginFunction<
     getEnvVarName,
     missingPasswordCallback,
     session,
-    allowedBots,
   } = withDefaults(context.pluginArgs);
   const passwordHash = context.env[getEnvVarName(context)];
 
@@ -32,8 +31,7 @@ export const onRequest: PagesPluginFunction<
     context.request,
     passwordHash,
     passwordEncodingMethod,
-    passwordFieldName,
-    allowedBots
+    passwordFieldName
   );
 
   return autoSession<CookieData>({

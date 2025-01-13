@@ -4,11 +4,13 @@ export interface PluginArgsWithDefaults<Data extends CookieData> {
   cookieName: string;
   cookieSecret: string;
   formAsset: string;
+  byPass(request: Request): Promise<boolean>;
   login: (request: Request) => Promise<SessionSpec<Data>>;
   isValid: (data: Data) => boolean;
 }
 
 const Defaults = {
+  byPass: (_: Request): Promise<boolean> => Promise.resolve(false),
   cookieName: 'cloudflare-auto-session',
   cookieSecret: 'secret',
   login: async (request: Request): Promise<SessionSpec<CookieData>> => {

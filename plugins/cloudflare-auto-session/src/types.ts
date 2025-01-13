@@ -21,6 +21,7 @@ export interface PluginArgs<Data extends CookieData> {
   cookieName: string;
   cookieSecret: string;
   formAsset: string;
+  byPass(request: Request): Promise<boolean>;
   login: (request: Request) => Promise<SessionSpec<Data>>;
   isValid: (session: Data) => boolean;
 }

@@ -103,7 +103,8 @@ export class Session<Data extends CookieData> {
           cookieSpec.path,
           cookieSpec.expires,
           cookieSpec.maxAge,
-          cookieSpec.secure,
+          // Session cookies must never be sent over an unencrypted connection.
+          true,
           cookieSpec.httpOnly,
           cookieSpec.sameSite
         ),

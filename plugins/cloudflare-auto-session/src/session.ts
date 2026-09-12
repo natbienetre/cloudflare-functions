@@ -113,7 +113,19 @@ export class Session<Data extends CookieData> {
 
   end(response: Response): Response {
     const newHeaders = new Headers(response.headers);
-    newHeaders.append('Set-Cookie', this.cookie.setCookieHeader());
+    newHeaders.append(
+      'Set-Cookie',
+      this.cookie.setCookieHeader(
+        '',
+        undefined,
+        '/',
+        undefined,
+        0,
+        true,
+        true,
+        'Strict'
+      )
+    );
     return new Response(response.body, {
       ...response,
       headers: newHeaders,

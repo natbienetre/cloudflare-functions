@@ -27,4 +27,13 @@ export interface PluginArgs<Data extends CookieData> {
   byPass(request: Request): Promise<boolean>;
   login: (request: Request) => Promise<SessionSpec<Data>>;
   isValid: (session: Data) => boolean;
+  /**
+   * Allow session cookies to be issued without the `Secure` attribute.
+   *
+   * Defaults to `false` (cookies are always `Secure`). Intended for local
+   * development only (e.g. `wrangler pages dev` over plain HTTP), where
+   * browsers would otherwise refuse to store a `Secure` cookie. Do not set
+   * this to `true` in production or staging deployments.
+   */
+  allowInsecureCookies?: boolean;
 }

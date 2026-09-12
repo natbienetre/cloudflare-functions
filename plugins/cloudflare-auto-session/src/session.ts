@@ -1,7 +1,7 @@
 import { parseCookie } from 'cookie';
 import { createHmac } from 'node:crypto';
 
-import { Cookie } from './cookie';
+import { Cookie } from './cookie.ts';
 import type { CookieSpec, CookieData, PluginArgs } from './types';
 
 const signatureAlgorithm = 'sha256';
@@ -12,11 +12,13 @@ export class Session<Data extends CookieData> {
   readonly cookieSecret: string;
   readonly isValid: (data: Data) => boolean;
   readonly cookie: Cookie;
+  readonly allowInsecureCookies: boolean;
 
   constructor(
     cookieName: string,
     cookieSecret: string,
-    isValid: (data: Data) => boolean
+    isValid: (data: Data) => boolean,
+    allowInsecureCookies = false
   ) {
     if (cookieName === '') {
       throw new Error('Cookie name must be provided');
@@ -28,6 +30,7 @@ export class Session<Data extends CookieData> {
     this.cookie = new Cookie(cookieName);
     this.cookieSecret = cookieSecret;
     this.isValid = isValid;
+    this.allowInsecureCookies = allowInsecureCookies;
   }
 
   getCookie(request: Request): string | undefined {
@@ -107,8 +110,9 @@ export class Session<Data extends CookieData> {
           cookieSpec.path,
           cookieSpec.expires,
           cookieSpec.maxAge,
-          // Session cookies must never be sent over an unencrypted connection.
-          true,
+          // Session cookies are Secure unless allowInsecureCookies opts out
+          // (intended for local development only; see PluginArgs).
+          !this.allowInsecureCookies,
           true,
           cookieSpec.sameSite ?? 'Lax'
         ),
@@ -126,7 +130,7 @@ export class Session<Data extends CookieData> {
         '/',
         undefined,
         0,
-        true,
+        !this.allowInsecureCookies,
         true,
         'Strict'
       )

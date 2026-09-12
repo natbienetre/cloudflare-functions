@@ -14,10 +14,21 @@ export const onRequestGet: PagesPluginFunction<
   const { request, pluginArgs, next } = context;
 
   // Get the arguments given to the Plugin by the developer
-  const { cookieName, cookieSecret, formAsset, isValid, byPass } =
-    withDefaults(pluginArgs);
+  const {
+    cookieName,
+    cookieSecret,
+    formAsset,
+    isValid,
+    byPass,
+    allowInsecureCookies,
+  } = withDefaults(pluginArgs);
 
-  const session = new Session(cookieName, cookieSecret, isValid);
+  const session = new Session(
+    cookieName,
+    cookieSecret,
+    isValid,
+    allowInsecureCookies
+  );
 
   return [
     byPass,
@@ -55,9 +66,15 @@ export const onRequestPost: PagesPluginFunction<
 > = async ({ request, pluginArgs }) => {
   // Get the arguments given to the Plugin by the developer
   // AllowedBot is not used for POST requests
-  const { cookieName, cookieSecret, login, isValid } = withDefaults(pluginArgs);
+  const { cookieName, cookieSecret, login, isValid, allowInsecureCookies } =
+    withDefaults(pluginArgs);
 
-  const session = new Session(cookieName, cookieSecret, isValid);
+  const session = new Session(
+    cookieName,
+    cookieSecret,
+    isValid,
+    allowInsecureCookies
+  );
 
   return login(request).then(
     ({ authenticated, allowed, cookie }: SessionSpec<CookieData>): Response => {

@@ -7,6 +7,7 @@ export interface PluginArgsWithDefaults<Data extends CookieData> {
   byPass(request: Request): Promise<boolean>;
   login: (request: Request) => Promise<SessionSpec<Data>>;
   isValid: (data: Data) => boolean;
+  allowInsecureCookies: boolean;
 }
 
 const Defaults = {
@@ -30,6 +31,7 @@ const Defaults = {
   },
   formAsset: '/nbe-login/',
   isValid: (_: CookieData): boolean => true,
+  allowInsecureCookies: false,
 };
 
 export function withDefaults<Data extends CookieData>(

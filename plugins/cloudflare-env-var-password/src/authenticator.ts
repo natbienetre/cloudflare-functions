@@ -49,8 +49,6 @@ export class Auth {
       data: data,
       path: this.url.pathname,
       domain: this.url.hostname,
-      secure: this.url.protocol === 'https:',
-      httpOnly: true,
       sameSite: 'Lax',
     };
   }

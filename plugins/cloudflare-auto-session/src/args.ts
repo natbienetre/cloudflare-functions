@@ -21,8 +21,6 @@ const Defaults = {
       cookie: {
         path: url.pathname,
         domain: url.hostname,
-        secure: url.protocol === 'https:',
-        httpOnly: true,
         sameSite: 'Lax',
         data: {},
       },

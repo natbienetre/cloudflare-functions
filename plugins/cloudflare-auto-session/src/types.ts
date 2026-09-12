@@ -6,10 +6,6 @@ export interface CookieSpec<Data extends CookieData> {
   path?: string;
   expires?: Date;
   maxAge?: number;
-  /** Session cookies are secure by default; `false` is rejected. */
-  secure?: boolean;
-  /** Session cookies are HTTP-only by default; `false` is rejected. */
-  httpOnly?: boolean;
   /** Defaults to `Lax`. */
   sameSite?: 'Strict' | 'Lax' | 'None';
 }

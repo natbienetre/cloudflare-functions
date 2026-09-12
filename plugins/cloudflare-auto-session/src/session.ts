@@ -93,6 +93,10 @@ export class Session<Data extends CookieData> {
   }
 
   start(request: Request, cookieSpec: CookieSpec<Data>): Response {
+    if (cookieSpec.secure === false || cookieSpec.httpOnly === false) {
+      throw new Error('Session cookies must be Secure and HttpOnly');
+    }
+
     return new Response(`Logged in`, {
       status: 302,
       headers: {
@@ -105,8 +109,8 @@ export class Session<Data extends CookieData> {
           cookieSpec.maxAge,
           // Session cookies must never be sent over an unencrypted connection.
           true,
-          cookieSpec.httpOnly,
-          cookieSpec.sameSite
+          true,
+          cookieSpec.sameSite ?? 'Lax'
         ),
       },
     });

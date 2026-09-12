@@ -23,9 +23,9 @@ export class Cookie {
       path !== undefined ? 'Path=' + path : undefined,
       expires !== undefined ? 'Expires=' + expires.toUTCString() : undefined,
       maxAge !== undefined ? 'Max-Age=' + maxAge.toString() : undefined,
-      (secure ?? false) ? 'Secure' : undefined,
-      (httpOnly ?? false) ? 'HttpOnly' : undefined,
-      sameSite !== undefined ? 'SameSite=' + sameSite : undefined,
+      (secure ?? true) ? 'Secure' : undefined,
+      (httpOnly ?? true) ? 'HttpOnly' : undefined,
+      'SameSite=' + (sameSite ?? 'Lax'),
     ];
 
     return cookieParts.filter(part => part !== undefined).join('; ');

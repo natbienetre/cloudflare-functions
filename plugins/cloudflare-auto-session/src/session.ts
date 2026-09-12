@@ -1,4 +1,4 @@
-import { parse } from 'cookie';
+import { parseCookie } from 'cookie';
 import { createHmac } from 'node:crypto';
 
 import { Cookie } from './cookie';
@@ -36,7 +36,7 @@ export class Session<Data extends CookieData> {
       return undefined;
     }
 
-    const cookies = parse(cookieHeader);
+    const cookies = parseCookie(cookieHeader);
 
     return cookies[this.cookie.name];
   }

@@ -7,9 +7,7 @@ export type CookieData = UntypedCookieData & {
 };
 
 export type PasswordEncodingMethod =
-  | string
-  | SubtleCryptoHashAlgorithm
-  | undefined;
+  string | SubtleCryptoHashAlgorithm | undefined;
 
 export class AutoSessionArgs {
   cookieName?: string;

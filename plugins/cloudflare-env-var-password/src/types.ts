@@ -3,7 +3,6 @@ import type { CookieData as UntypedCookieData } from '@natbienetre/cloudflare-au
 export type CookieData = UntypedCookieData & {
   path: string;
   source: string;
-  userData?: FormData;
 };
 
 export type PasswordEncodingMethod =

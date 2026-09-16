@@ -88,16 +88,11 @@ export class Auth {
 
           console.info('Password match');
 
-          // Remove the password from the form data
-          // before storing it in the cookie
-          formData.delete(this.passwordFieldName);
-
           return {
             authenticated: true,
             allowed: true,
             cookie: this.cookieSpec({
               source: 'user-form',
-              userData: formData,
             }),
           };
         });

@@ -3,24 +3,32 @@ import {
   type CookieSpec,
 } from '@natbienetre/cloudflare-auto-session';
 
-import type { PasswordEncodingMethod, CookieData } from './types';
+import { extractUserData } from './user-data';
+import type { PasswordEncodingMethod, CookieData, UserData } from './types';
+
+export type AuthSessionSpec = SessionSpec<CookieData> & {
+  userData?: UserData;
+};
 
 export class Auth {
   readonly passwordEncodingMethod: PasswordEncodingMethod;
   readonly passwordFieldName: string;
   readonly expectedPasswordHash: string;
+  readonly userDataFields: readonly string[];
   readonly url: URL;
 
   constructor(
     request: Request,
     passwordHash: string,
     passwordEncodingMethod: PasswordEncodingMethod,
-    passwordFieldName: string
+    passwordFieldName: string,
+    userDataFields: readonly string[] = []
   ) {
     this.url = new URL(request.url);
     this.passwordEncodingMethod = passwordEncodingMethod;
     this.passwordFieldName = passwordFieldName;
     this.expectedPasswordHash = passwordHash;
+    this.userDataFields = userDataFields;
   }
 
   isValid(data: CookieData): boolean {
@@ -53,7 +61,7 @@ export class Auth {
     };
   }
 
-  async sessionData(request: Request): Promise<SessionSpec<CookieData>> {
+  async sessionData(request: Request): Promise<AuthSessionSpec> {
     return request.formData().then(async formData => {
       const password = formData.get(this.passwordFieldName);
 
@@ -65,6 +73,18 @@ export class Auth {
           allowed: false,
           cookie: this.cookieSpec({
             source: 'no-password',
+          }),
+        };
+      }
+
+      if (typeof password !== 'string') {
+        console.warn('Password must be a string');
+
+        return {
+          authenticated: true,
+          allowed: false,
+          cookie: this.cookieSpec({
+            source: 'invalid-password',
           }),
         };
       }
@@ -91,6 +111,10 @@ export class Auth {
           return {
             authenticated: true,
             allowed: true,
+            userData:
+              this.userDataFields.length === 0
+                ? undefined
+                : extractUserData(formData, this.userDataFields),
             cookie: this.cookieSpec({
               source: 'user-form',
             }),

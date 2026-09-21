@@ -5,6 +5,21 @@ export type CookieData = UntypedCookieData & {
   source: string;
 };
 
+export type UserData = Record<string, string[]>;
+
+export interface UserDataCookieArgs {
+  /** Form fields to include. The password field is always excluded. */
+  fields: readonly string[];
+  /** Name of the Cloudflare secret containing a PKCS#8 ES256 private key. */
+  privateKeyEnvVarName: string;
+  /** Defaults to `__Host-cloudflare-user-data`. */
+  cookieName?: string;
+  /** Optional JWS key identifier used for key rotation. */
+  keyId?: string;
+  /** Lifetime in seconds. Defaults to 3600 and cannot exceed 86400. */
+  maxAge?: number;
+}
+
 export type PasswordEncodingMethod =
   string | SubtleCryptoHashAlgorithm | undefined;
 
@@ -27,4 +42,9 @@ export interface PluginArgs {
   ) => string;
   passwordEncodingMethod: PasswordEncodingMethod;
   passwordFieldName: string;
+  /**
+   * Opt-in, browser-readable identification data. This data must never be
+   * used for authorization and must be safely rendered by browser code.
+   */
+  userDataCookie?: UserDataCookieArgs;
 }

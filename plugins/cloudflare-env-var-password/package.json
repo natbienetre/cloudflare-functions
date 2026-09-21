@@ -17,6 +17,7 @@
     "format": "prettier --check --write \"**/*.{ts,js,mjs,json,md}\"",
     "prettier": "prettier --check \"**/*.{ts,js,mjs,json,md}\"",
     "lint": "eslint .",
+    "test": "node --experimental-strip-types --test test/*.test.mjs",
     "predev": "cd ../cloudflare-auto-session && yarn build && (test -L $(npm root)/@natbienetre || (rm -rf $(npm root)/@natbienetre && ln -s ../.. $(npm root)/@natbienetre))",
     "dev": "npm run build"
   },

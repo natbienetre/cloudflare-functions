@@ -18,6 +18,7 @@
     "prettier": "prettier --check \"**/*.{ts,js,mjs,json,md}\"",
     "lint": "eslint .",
     "test": "node --experimental-strip-types --test test/*.test.mjs",
+    "test:junit": "node --experimental-strip-types --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=unit-tests.junit.xml test/user-data.test.mjs",
     "predev": "cd ../cloudflare-auto-session && yarn build && (test -L $(npm root)/@natbienetre || (rm -rf $(npm root)/@natbienetre && ln -s ../.. $(npm root)/@natbienetre))",
     "dev": "npm run build"
   },

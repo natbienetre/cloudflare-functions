@@ -1,46 +1,73 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
 name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
   checks: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-        # See supported Node.js release schedule at https://developers.cloudflare.com/pages/platform/language-support-and-tools/
+    timeout-minutes: 10
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-    - name: Cache node modules
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: ./.yarn/cache
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-    - run: make -C plugins ci-test
-      env:
-        CACHE_FOLDER: ${{ github.workspace }}/.yarn/cache
+      - name: Enable Corepack
+        run: corepack enable
 
-    - name: Publish Test Report
-      uses: mikepenz/action-junit-report@v3
-      if: always()
-      with:
-        report_paths: "**/*.junit.xml"
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            plugins/cloudflare-auto-session/.yarn/cache
+            plugins/cloudflare-env-var-password/.yarn/cache
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install cloudflare-auto-session dependencies
+        working-directory: plugins/cloudflare-auto-session
+        run: yarn install --immutable
+
+      - name: Install cloudflare-env-var-password dependencies
+        working-directory: plugins/cloudflare-env-var-password
+        run: yarn install --immutable
+
+      - name: Lint cloudflare-auto-session
+        working-directory: plugins/cloudflare-auto-session
+        run: yarn lint
+
+      - name: Lint cloudflare-env-var-password
+        working-directory: plugins/cloudflare-env-var-password
+        run: yarn lint
+
+      - name: Run cloudflare-env-var-password unit tests
+        if: ${{ !cancelled() }}
+        working-directory: plugins/cloudflare-env-var-password
+        run: yarn test:junit
+
+      - name: Publish JUnit test report
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          check_name: JUnit Test Report
+          report_paths: plugins/cloudflare-env-var-password/unit-tests.junit.xml
+          require_tests: true

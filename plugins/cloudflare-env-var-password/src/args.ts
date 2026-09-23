@@ -71,6 +71,8 @@ function withUserDataCookieDefaults(
     ...args,
   };
 
+  // Validate every value later used in a header, key lookup, or JWS header
+  // before handling any untrusted form submission.
   if (!cookieNamePattern.test(result.cookieName)) {
     throw new Error('Invalid user data cookie name');
   }
@@ -104,6 +106,8 @@ function withUserDataCookieDefaults(
   }
 
   const uniqueFields = new Set(result.fields);
+  // Duplicate fields create ambiguous payloads, and the credential itself
+  // must never cross into the browser-readable identification cookie.
   if (
     uniqueFields.size !== result.fields.length ||
     result.fields.some(

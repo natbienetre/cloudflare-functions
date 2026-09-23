@@ -6,6 +6,9 @@ import {
 import { extractUserData } from './user-data';
 import type { PasswordEncodingMethod, CookieData, UserData } from './types';
 
+// userData is an out-of-band result consumed by the wrapper middleware. It is
+// intentionally absent from CookieData, so auto-session never serializes it
+// into the HttpOnly cookie used to grant access.
 export type AuthSessionSpec = SessionSpec<CookieData> & {
   userData?: UserData;
 };
@@ -111,6 +114,8 @@ export class Auth {
           return {
             authenticated: true,
             allowed: true,
+            // Extraction happens only after the password succeeds and only
+            // for fields explicitly selected by the deployment.
             userData:
               this.userDataFields.length === 0
                 ? undefined

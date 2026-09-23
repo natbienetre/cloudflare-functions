@@ -1,5 +1,7 @@
 import type { UserData } from './types';
 
+// Bound each untrusted form dimension and leave room below common 4 KiB cookie
+// limits for the JWS header, signature, and cookie attributes.
 const maxValuesPerField = 8;
 const maxValueLength = 256;
 const maxPayloadBytes = 2048;
@@ -61,6 +63,8 @@ export function extractUserData(
 ): UserData {
   const userData: UserData = {};
 
+  // Only configured fields cross the request boundary. FormData values may
+  // also be Files, which are rejected rather than implicitly stringified.
   for (const field of fields) {
     const values = formData.getAll(field);
 
@@ -106,6 +110,8 @@ export async function signUserData(
     userData,
   };
   const signingInput = `${encodeJson(header)}.${encodeJson(claims)}`;
+  // Import as non-extractable so application code cannot export the secret
+  // key after Web Crypto has accepted it.
   const key = await importPrivateKey(privateKeyPem);
   const signature = new Uint8Array(
     await crypto.subtle.sign(
@@ -115,6 +121,8 @@ export async function signUserData(
     )
   );
 
+  // ES256 JWS signatures use the 64-byte raw R || S representation returned
+  // by Web Crypto, not an ASN.1 DER-encoded ECDSA signature.
   if (signature.byteLength !== 64) {
     throw new Error('Unexpected ES256 signature length');
   }
@@ -126,6 +134,9 @@ export function setUserDataCookieHeader(
   token: string,
   config: UserDataCookieConfig
 ): string {
+  // HttpOnly is deliberately omitted: browser code must be able to read and
+  // verify this identification token. It is separate from the HttpOnly cookie
+  // used for authorization. Omitting Domain keeps this cookie host-only.
   return `${config.cookieName}=${token}; Path=/; Max-Age=${config.maxAge}; Secure; SameSite=Lax`;
 }
 
